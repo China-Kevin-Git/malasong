@@ -3,6 +3,7 @@
 namespace app\ebapi\controller;
 
 use app\common\service\MacthService;
+use think\Db;
 use think\Request;
 use service\UtilService as Util;
 use service\PHPTreeService as Phptree;
@@ -148,4 +149,78 @@ class Macth extends AuthController
         }
         return self::asJson($result['data']);
     }
+
+    /**
+     * 全部赛事
+     *
+     */
+    public function allMacth()
+    {
+        $data=input('post.');
+
+        //type:1 分类 2.日期 3.地区
+        if(empty($data['type'])){
+            $data['type']=0;
+        }
+        if($data['type']==1){
+            $where=" a.match_catrgory_id=".$data['value'];
+        }elseif($data['type']==2){
+            $date=explode('-',$data['value']);
+            $star_time = date("Y-m-d H:i:s", mktime(0, 0, 0, (float)$date[1],(float)$date[2],(float)$date[0]));
+            $end_time = date("Y-m-d H:i:s", mktime(0, 0, 0, (float)$date[1], (float)$date[2]+1, (float)$date[0]));
+            $time["star"] = strtotime($star_time);
+            $time["end"] = strtotime($end_time);
+            $where="a.match_starat BETWEEN ".$time["star"] ." AND ".$time["end"];
+        }elseif($data['type']==3){
+            $where=" a.province=".$data['value'];
+        }else{
+            $where="1=1";
+        }
+        //order_type  1  时间排序 2 人气  默认时间
+        if(empty($data['order_type'])){
+            $data['order_type']=0;
+        }
+
+        if($data['order_type']==2){
+            $order="b.follow_num desc";
+        }else{
+            $order="a.match_starat desc";
+        }
+
+        $match=Db::name('match')
+            ->field('a.id,a.match_name,a.province,a.city,a.match_starat,a.logo,b.follow_num')
+            ->alias('a')
+            ->join('match_follow b','a.id=b.match_id')
+            ->where($where)
+            ->order($order)
+            ->page($data['page'],5)
+            ->select();
+        foreach ($match as $k=>$v){
+            $match[$k]['address']=$v['province'].$v['city'];
+            $match[$k]['match_starat']=date('Y-m-d',$v['match_starat']);
+            unset($match[$k]['province']);
+            unset($match[$k]['city']);
+        }
+        return self::asJson($match);
+
+    }
+
+    /**
+     * 赛事分类
+     *
+     */
+    public function macthCatgory(){
+        $match=Db::name('match_catrgory')
+            ->select();
+        return self::asJson($match);
+
+    }
+
+    /**
+     * 赛事详情
+     */
+    public function details(){
+
+    }
+
 }
