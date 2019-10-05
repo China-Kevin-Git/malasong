@@ -206,7 +206,7 @@ class Macth extends Controller
             ->join('match_follow b','a.id=b.match_id')
             ->where($where)
             ->order($order)
-            ->page($data['page'],5)
+            ->page($data['page'],10)
             ->select();
         foreach ($match as $k=>$v){
             $match[$k]['address']=$v['province'].$v['city'];
