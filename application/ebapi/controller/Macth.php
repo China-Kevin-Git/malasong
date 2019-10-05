@@ -27,7 +27,6 @@ class Macth extends Controller
         return json_encode(['data' => $data,'code' => $code,'msg' => $msg]);
     }
 
-
     public function request()
     {
         header('Content-type:text/json');
@@ -267,6 +266,28 @@ class Macth extends Controller
         }
 
         return self::asJson($match);
+
+    }
+
+    /**
+     * 获取月份下面的场次
+     */
+    public function month(){
+        $data = input("post.");
+        $data['month']=str_replace('年','-',$data['month']);
+        $data['month']=str_replace('月','',$data['month']);
+        $month_start = strtotime($data['month']);//指定月份月初时间戳
+        $month_end = mktime(23, 59, 59, date('m', strtotime($data['month']))+1, 00);
+
+        $match = Db::name('match')->where("match_starat","BETWEEN",[$month_start,$month_end])->order("match_starat")->select();
+        foreach ($match as $k=>$v){
+            $date['start'] = strtotime( date('Y-m-d 00:00:00',$v['match_starat']));
+            $date['stop']  = strtotime(date('Y-m-d 23:59:59',$v['match_starat']));
+            $array[ date('Y-m-d',$v['match_starat'])]['num']= Db::name('match')->where('match_starat','>',$date['start'])->where('match_starat','<',$date['stop'])->count();  //赛事表
+            $array[ date('Y-m-d',$v['match_starat'])]['date']=(int)date('d',$v['match_starat']);
+        }
+        $array=array_values($array);
+        return self::asJson($array);
 
     }
 
