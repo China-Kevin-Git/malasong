@@ -3,19 +3,32 @@
 namespace app\ebapi\controller;
 
 use app\common\service\MacthService;
+use think\Controller;
 use think\Db;
 use think\Request;
-use service\UtilService as Util;
-use service\PHPTreeService as Phptree;
-use app\admin\model\article\ArticleCategory as ArticleCategoryModel;
+
 
 /**
  * 赛事接口
  * Class AgentManage
  * @package app\admin\controller\agent
  */
-class Macth extends AuthController
+class Macth extends Controller
 {
+
+    /**
+     * 统一返回格式
+     * @param array $data
+     * @param string $code
+     * @param string $msg
+     * @return array
+     */
+    public static function asJson($data = [],$code = 200,$msg = 'ok')
+    {
+        return json_encode(['data' => $data,'code' => $code,'msg' => $msg]);
+    }
+
+
     public function request()
     {
         header('Content-type:text/json');
@@ -220,6 +233,30 @@ class Macth extends AuthController
      * 赛事详情
      */
     public function details(){
+        $id=input("post.id");
+        $match=Db::name('match')->field("enroll_time,match_starat,match_name,province,city,area,logo")->where(['id'=>$id])->find();
+        $match['match_starat']=date('Y-m-d',$match['match_starat']);
+        $match["address"]=$match["province"].$match["city"].$match["area"];
+        unset($match["province"]);
+        unset($match["city"]);
+        unset($match["area"]);
+        return self::asJson($match);
+
+    }
+
+    /**
+     * 赛事详情下部分
+     */
+    public function detailsContent(){
+        $data=input("post.");
+        if($data['type']==1){
+            $match=Db::name('match')->field("content")->where(['id'=>$data['id']])->find();
+            $match['content']=get_html_translation_table($match['content']);
+        }elseif ($data['type']==2){
+
+        }
+
+        return self::asJson($match);
 
     }
 
