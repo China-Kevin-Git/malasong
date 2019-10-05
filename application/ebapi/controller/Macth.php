@@ -181,6 +181,7 @@ class Macth extends Controller
             }
 
         }elseif($data['type']==2){
+
             $date=explode('-',$data['value']);
             $star_time = date("Y-m-d H:i:s", mktime(0, 0, 0, (float)$date[1],(float)$date[2],(float)$date[0]));
             $end_time = date("Y-m-d H:i:s", mktime(0, 0, 0, (float)$date[1], (float)$date[2]+1, (float)$date[0]));
@@ -188,7 +189,7 @@ class Macth extends Controller
             $time["end"] = strtotime($end_time);
             $where="a.match_starat BETWEEN ".$time["star"] ." AND ".$time["end"];
         }elseif($data['type']==3){
-            $where=" a.province=".$data['value'];
+            $where=['a.province'=>$data['value']];
         }else{
             $where="1=1";
         }
@@ -199,8 +200,10 @@ class Macth extends Controller
 
         if($data['order_type']==2){
             $order="b.follow_num desc";
+        }elseif($data['order_type']==3){
+            $order="a.enroll_time";
         }else{
-            $order="a.match_starat desc";
+            $order="a.match_starat";
         }
 
         $match=Db::name('match')
@@ -258,7 +261,9 @@ class Macth extends Controller
             $match['match_red']=Db::name('match_red')->field("red_id,spec_name,price")->where(['match_id'=>$data['id']])->select();
             $match['content']=Db::name('match')->where(['id'=>$data['id']])->value('content');
         }elseif ($data['type']==3){
-            $match['meal']=Db::name('match_red')->field("red_id,spec_name,price")->where(['match_id'=>$data['id']])->select();
+            $match['meal']=Db::name('match_meal')->field("meal_id,title,price,logo,content")->where(['match_id'=>$data['id']])->page($data['page'],10)->select();
+        }elseif ($data['type']==4){
+            $match['match_goods']=Db::name('match_goods')->field("service_id,goods_name,price,logo,market_price")->where(['match_id'=>$data['id']])->page($data['page'],10)->select();
         }
 
         return self::asJson($match);
