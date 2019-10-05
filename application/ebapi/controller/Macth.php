@@ -7,7 +7,6 @@ use think\Controller;
 use think\Db;
 use think\Request;
 
-
 /**
  * 赛事接口
  * Class AgentManage
@@ -177,6 +176,10 @@ class Macth extends Controller
         }
         if($data['type']==1){
             $where=" a.match_catrgory_id=".$data['value'];
+            if($data['value']==1){
+                $where="1=1";
+            }
+
         }elseif($data['type']==2){
             $date=explode('-',$data['value']);
             $star_time = date("Y-m-d H:i:s", mktime(0, 0, 0, (float)$date[1],(float)$date[2],(float)$date[0]));
@@ -251,9 +254,11 @@ class Macth extends Controller
         $data=input("post.");
         if($data['type']==1){
             $match=Db::name('match')->field("content")->where(['id'=>$data['id']])->find();
-            $match['content']=get_html_translation_table($match['content']);
         }elseif ($data['type']==2){
-
+            $match['match_red']=Db::name('match_red')->field("red_id,spec_name,price")->where(['match_id'=>$data['id']])->select();
+            $match['content']=Db::name('match')->where(['id'=>$data['id']])->value('content');
+        }elseif ($data['type']==3){
+            $match['meal']=Db::name('match_red')->field("red_id,spec_name,price")->where(['match_id'=>$data['id']])->select();
         }
 
         return self::asJson($match);
