@@ -335,9 +335,9 @@ class Macth extends Controller
         }else{
             $service_id=json_decode($data['service_id']);
             foreach ($service_id as $k=>$v){
-                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->id])->value("price");
+                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->service_id])->value("price");
                 $match_goods_price+=$match_goods*$v->num;
-                Db::name("match_order_goods")->insert(['match_order_sn'=>$str,'num'=>$v->num,'price'=>$match_goods*$v->num,'add_time'=>time(),'service_id'=>$v->id]);
+                Db::name("match_order_goods")->insert(['match_order_sn'=>$str,'num'=>$v->num,'price'=>$match_goods*$v->num,'add_time'=>time(),'service_id'=>$v->service_id]);
             }
 
 
@@ -440,7 +440,7 @@ class Macth extends Controller
         }else{
             $service_id=json_decode($data['service_id']);
             foreach ($service_id as $k=>$v){
-                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->id])->value("price");
+                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->service_id])->value("price");
                 $match_goods_price+=$match_goods*$v->num;
             }
         }

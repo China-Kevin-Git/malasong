@@ -165,7 +165,6 @@ class StoreProduct extends ModelBasic
      * */
     public static function setLevelPrice($list,$uid,$isSingle=false)
     {
-        return $list;
         if(is_object($list)) $list=count($list) ? $list->toArray() : [];
         $levelId=UserLevel::getUserLevel($uid);
         if($levelId){
