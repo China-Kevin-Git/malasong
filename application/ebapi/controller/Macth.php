@@ -417,5 +417,38 @@ class Macth extends Controller
 
     }
 
+    /**
+     * 获取订单总价格
+     */
+    public function orderPrice(){
+        $data = input("post.");
+
+        $pricee = Db::name("match_red")->where(['red_id'=>$data['red_id']])->value("price");
+
+        //套餐
+        if(empty($data['meal_id'])){
+            $data['meal_id']=0;
+            $meal_price=0;
+        }else{
+            $meal_price = Db::name("match_meal")->where(['meal_id'=>$data['meal_id']])->value("price");
+        }
+
+        //可选服务
+        $match_goods_price=0;
+        if(empty($data['service_id'])){
+            $data['service_id']=0;
+        }else{
+            $service_id=json_decode($data['service_id']);
+            foreach ($service_id as $k=>$v){
+                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->id])->value("price");
+                $match_goods_price+=$match_goods*$v->num;
+            }
+        }
+        $order_price=$pricee+$meal_price+$match_goods_price;
+
+        return self::asJson($order_price);
+
+    }
+
 
 }
