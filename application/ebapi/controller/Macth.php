@@ -5,6 +5,7 @@ namespace app\ebapi\controller;
 use app\common\service\MacthService;
 use think\Controller;
 use think\Db;
+use think\exception\ErrorException;
 use think\Request;
 
 /**
@@ -311,17 +312,28 @@ class Macth extends Controller
      */
     public function sign()
     {
-        $data = input("post");
+        $data = input("post.");
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         $match_name = Db::name("match")->where(['id'=>$data['match_id']])->value("match_name");
-        $pricee = Db::name("match")->where(['match_id'=>$data['match_id'],'red_id'=>$data['red_id']])->value("price");
+        $pricee = Db::name("match_red")->where(['red_id'=>$data['red_id']])->value("price");
 
+
+        //套餐
         if(empty($data['meal_id'])){
             $data['meal_id']=0;
+            $meal_price=0;
+        }else{
+            $meal_price = Db::name("match_meal")->where(['meal_id'=>$data['meal_id']])->value("price");
         }
 
-
-        $order_price=$pricee;
+        //可选服务
+        if(empty($data['service_id'])){
+            $data['service_id']=0;
+            $match_goods_price=0;
+        }else{
+            $match_goods_price = Db::name("match_goods")->where(['service_id'=>$data['service_id']])->value("price");
+        }
+        $order_price=$pricee+$meal_price+$match_goods_price;
 
         $add=[
             "uid"=>$data["uid"],
@@ -331,12 +343,13 @@ class Macth extends Controller
             "add_time"=>time(),
             "match_name"=>$match_name,
             "remarks"=>$data["remarks"],
-            "red_id"=>$data["uid"],
+            "red_id"=>$data["red_id"],
             "meal_id"=>$data["meal_id"],
             "service_id"=>$data["service_id"],
         ];
-        $match = Db::name("match_order")->insert($add);
-        return self::asJson($match);
+        Db::name("match_order")->insert($add);
+
+        return self::asJson($str);
     }
 
 

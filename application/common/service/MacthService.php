@@ -190,6 +190,7 @@ class MacthService extends Service
         foreach ($res as $key => $value){
             $res[$key]['create_at'] = date('Y-m-d H:i:s',$value['create_at']);
             $res[$key]['update_at'] = date('Y-m-d H:i:s',$value['update_at']);
+            $res[$key]['avatar'] = Db::name("user")->where(['uid'=>$value['user_id']])->value('avatar');
         }
         return self::set_err($res);
     }
