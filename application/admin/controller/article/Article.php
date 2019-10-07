@@ -30,6 +30,7 @@ class Article extends AuthController
             ['cid','']
         ],$this->request);
         $pid = $this->request->param('pid');
+
         $this->assign('where',$where);
         $where['merchant'] = 0;//区分是管理员添加的图文显示  0 还是 商户添加的图文显示  1
         $catlist = ArticleCategoryModel::where('is_del',0)->select()->toArray();

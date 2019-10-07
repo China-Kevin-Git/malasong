@@ -326,12 +326,21 @@ class Macth extends Controller
             $meal_price = Db::name("match_meal")->where(['meal_id'=>$data['meal_id']])->value("price");
         }
 
+
+
         //可选服务
+        $match_goods_price=0;
         if(empty($data['service_id'])){
             $data['service_id']=0;
-            $match_goods_price=0;
         }else{
-            $match_goods_price = Db::name("match_goods")->where(['service_id'=>$data['service_id']])->value("price");
+            $service_id=json_decode($data['service_id']);
+            foreach ($service_id as $k=>$v){
+                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->id])->value("price");
+                $match_goods_price+=$match_goods*$v->num;
+                Db::name("match_order_goods")->insert(['match_order_sn'=>$str,'num'=>$v->num,'price'=>$match_goods*$v->num,'add_time'=>time(),'service_id'=>$v->id]);
+            }
+
+
         }
         $order_price=$pricee+$meal_price+$match_goods_price;
 
