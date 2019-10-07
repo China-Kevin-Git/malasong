@@ -317,7 +317,6 @@ class Macth extends AuthController
         $match_name = Db::name("match")->where(['id'=>$data['match_id']])->value("match_name");
         $pricee = Db::name("match_red")->where(['red_id'=>$data['red_id']])->value("price");
 
-
         //套餐
         if(empty($data['meal_id'])){
             $data['meal_id']=0;

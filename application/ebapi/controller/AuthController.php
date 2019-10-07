@@ -8,23 +8,32 @@ class AuthController extends Basic
 
     protected $userInfo = [];
 
+    protected $action = [
+        "index",
+        "matchCount",
+        "queryMatch",
+        "queryFollow",
+        "article",
+        "article",
+        "allMacth",
+        "macthCatgory",
+        "details",
+        "detailsContent",
+        "month",
+        "search",
+        "orderPrice",
+
+    ];
+
     protected function _initialize()
     {
-        parent::_initialize();
-        //验证TOken并获取user信息
-        $this->userInfo=$this->checkTokenGetUserInfo();
-        $this->uid=isset($this->userInfo['uid']) ? $this->userInfo['uid'] : 0;
-    }
-    /**
-     * 统一返回格式
-     * @param array $data
-     * @param string $code
-     * @param string $msg
-     * @return array
-     */
-    public static function asJson($data = [],$code = '000000',$msg = '')
-    {
-        return json_encode(['data' => $data,'code' => (string)$code,'msg' => $msg]);
-    }
 
+        parent::_initialize();
+        if(in_array(request()->action(),$this->action)==false){
+            //验证TOken并获取user信息
+            $this->userInfo=$this->checkTokenGetUserInfo();
+            $this->uid=isset($this->userInfo['uid']) ? $this->userInfo['uid'] : 0;
+        }
+
+    }
 }

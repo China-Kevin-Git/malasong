@@ -6,6 +6,7 @@ use app\core\model\user\UserLevel;
 use service\JsonService;
 use app\core\util\SystemConfigService;
 use service\UtilService;
+use think\Db;
 use think\Request;
 use app\core\behavior\GoodsBehavior;//待完善
 use app\ebapi\model\store\StoreCouponUser;
@@ -155,7 +156,7 @@ class AuthApi extends AuthController
     {
         return JsonService::successful('ok', StoreCart::getUserCartNum($this->userInfo['uid'], 'product'));
     }
-    
+
     /**
      * 修改购物车产品数量
      * @param string $cartId
@@ -286,10 +287,21 @@ class AuthApi extends AuthController
     public function pay_order($uni = '', $paytype = 'weixin')
     {
         if (!$uni) return JsonService::fail('参数错误!');
-        $order = StoreOrder::getUserOrderDetail($this->userInfo['uid'], $uni);
-        if (!$order) return JsonService::fail('订单不存在!');
-        if ($order['paid']) return JsonService::fail('该订单已支付!');
-        if ($order['pink_id']) if (StorePink::isPinkStatus($order['pink_id'])) return JsonService::fail('该订单已失效!');
+
+        if(strpos($uni,'match-') !==false){
+            $order = Db::name("match_order")->where(['match_order_sn'=>$uni])->find();
+            $order['order_id'] = $order["match_id"];
+            if (!$order) return JsonService::fail('订单不存在!');
+            if ($order['is_pay']) return JsonService::fail('该订单已支付!');
+
+        }else{
+            $order = StoreOrder::getUserOrderDetail($this->userInfo['uid'], $uni);
+            if (!$order) return JsonService::fail('订单不存在!');
+            if ($order['paid']) return JsonService::fail('该订单已支付!');
+            if ($order['pink_id']) if (StorePink::isPinkStatus($order['pink_id'])) return JsonService::fail('该订单已失效!');
+
+        }
+
         $order['pay_type'] = $paytype; //重新支付选择支付方式
         switch ($order['pay_type']) {
             case 'weixin':
@@ -297,6 +309,7 @@ class AuthApi extends AuthController
                     $jsConfig = StoreOrder::jsPay($order); //订单列表发起支付
                     if(isset($jsConfig['package']) && $jsConfig['package']){
                         $package=str_replace('prepay_id=','',$jsConfig['package']);
+
                         for($i=0;$i<3;$i++){
                             RoutineFormId::SetFormId($package, $this->uid);
                         }
@@ -304,6 +317,7 @@ class AuthApi extends AuthController
                 } catch (\Exception $e) {
                     return JsonService::fail($e->getMessage());
                 }
+
                 return JsonService::status('wechat_pay', ['jsConfig' => $jsConfig, 'order_id' => $order['order_id']]);
                 break;
             case 'yue':

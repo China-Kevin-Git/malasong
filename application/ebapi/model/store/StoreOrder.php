@@ -125,7 +125,7 @@ class StoreOrder extends ModelBasic
         $totalPrice = 0;
         foreach ($cartInfo as $cart){
             if($cart['combination_id']){
-                 $totalPrice = bcadd($totalPrice,bcmul($cart['cart_num'],StoreCombination::where('id',$cart['combination_id'])->value('price'),2),2);
+                $totalPrice = bcadd($totalPrice,bcmul($cart['cart_num'],StoreCombination::where('id',$cart['combination_id'])->value('price'),2),2);
             }
         }
         return (float)$totalPrice;
@@ -379,13 +379,20 @@ class StoreOrder extends ModelBasic
     //TODO JS支付
     public static function jsPay($orderId,$field = 'order_id')
     {
-        if(is_string($orderId))
-            $orderInfo = self::where($field,$orderId)->find();
-        else
-            $orderInfo = $orderId;
-        if(!$orderInfo || !isset($orderInfo['paid'])) exception('支付订单不存在!');
-        if($orderInfo['paid']) exception('支付已支付!');
-        if($orderInfo['pay_price'] <= 0) exception('该支付无需支付!');
+
+        if(strpos($orderId["match_order_sn"],'match-') !==false){
+            $orderInfo['order_id']=$orderId["match_order_sn"];
+            $orderInfo['pay_price']=$orderId["order_price"];
+            $orderInfo['uid']=$orderId["uid"];
+        }else{
+            if(is_string($orderId))
+                $orderInfo = self::where($field,$orderId)->find();
+            else
+                $orderInfo = $orderId;
+            if(!$orderInfo || !isset($orderInfo['paid'])) exception('支付订单不存在!');
+            if($orderInfo['paid']) exception('支付已支付!');
+            if($orderInfo['pay_price'] <= 0) exception('该支付无需支付!');
+        }
         $openid = WechatUser::getOpenId($orderInfo['uid']);
         return MiniProgramService::jsPay($openid,$orderInfo['order_id'],$orderInfo['pay_price'],'productr',SystemConfigService::get('site_name'));
     }
@@ -434,7 +441,7 @@ class StoreOrder extends ModelBasic
         return $res;
     }
 
-   
+
 
     /**
      * 用户申请退款
@@ -773,7 +780,7 @@ class StoreOrder extends ModelBasic
         foreach ($list as $k=>$order){
             $list[$k] = self::tidyOrder($order,true);
         }
-       
+
         return $list;
     }
 
