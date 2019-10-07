@@ -13,7 +13,7 @@ use think\Request;
  * Class AgentManage
  * @package app\admin\controller\agent
  */
-class Macth extends Controller
+class Macth extends AuthController
 {
 
     /**
@@ -345,7 +345,7 @@ class Macth extends Controller
         $order_price=$pricee+$meal_price+$match_goods_price;
 
         $add=[
-            "uid"=>$data["uid"],
+            "uid"=>$this->uid,
             "match_id"=>$data["match_id"],
             "order_price"=>$order_price,
             "match_order_sn"=>$str,
@@ -392,7 +392,7 @@ class Macth extends Controller
 
         $match_order = Db::name("match_order")
             ->field("match_id,order_price,is_pay,status,add_time,match_name")
-            ->where("uid",'=',$data['user_id'])
+            ->where("uid",'=',$this->uid)
             ->where($where)
             ->order("add_time desc")
             ->page($data["page"],10)
@@ -422,7 +422,6 @@ class Macth extends Controller
      */
     public function orderPrice(){
         $data = input("post.");
-
         $pricee = Db::name("match_red")->where(['red_id'=>$data['red_id']])->value("price");
 
         //套餐
