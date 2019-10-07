@@ -352,6 +352,18 @@ class Macth extends Controller
         return self::asJson($str);
     }
 
+    /**
+     * 完善资料
+     */
+    public function means()
+    {
+        $data = input("post.");
+
+        Db::name("match_means")->insert($data);
+        Db::name("match_order")->where(['match_order_id'=>$data['match_order_id']])->update(["status"=>2]);
+        return self::asJson();
+    }
+
 
 
 }
