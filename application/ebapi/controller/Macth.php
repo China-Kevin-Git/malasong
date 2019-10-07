@@ -291,4 +291,43 @@ class Macth extends Controller
 
     }
 
+    /**
+     * 赛事搜索
+     * @return array
+     */
+    public function search()
+    {
+        $data = input("post");
+
+        $match = Db::name("match")->field("id,match_name")->whereLike("match_name","%".$data['keyword']."%")->select();
+
+        return self::asJson($match);
+    }
+
+    /**
+     * 确认报名订单
+     * @return array
+     */
+    public function sign()
+    {
+        $data = input("post");
+
+        $add=[
+            "uid"=>$data["uid"],
+            "match_id"=>$data["match_id"],
+            "order_price"=>$data["uid"],
+            "match_order_sn"=>$data["uid"],
+            "add_time"=>time(),
+            "match_name"=>$data["uid"],
+            "remarks"=>$data["remarks"],
+            "red_id"=>$data["uid"],
+            "meal_id"=>$data["uid"],
+            "service_id"=>$data["uid"],
+        ];
+        $match = Db::name("match_order")->insert($add);
+        return self::asJson($match);
+    }
+
+
+
 }

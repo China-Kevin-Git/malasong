@@ -105,6 +105,7 @@ class MacthService extends Service
     {
         if(isset($data['city']) && $data['city']){  //本地赛事
             $follow = Db::table('eb_match_follow')->where(['city' => $data['city']])->page(1,3)->order('create_at desc')->select();
+
         }else if(isset($data['popular']) && $data['popular']){ //最热赛事
             $follow = Db::table('eb_match_follow')->page(1,3)->order('follow_num desc')->select();
         }else if(isset($data['page']) && $data['page']){ //更多
@@ -115,6 +116,10 @@ class MacthService extends Service
         foreach ($follow as $key => $value){
             $follow[$key]['create_at'] = date('Y-m-d',$value['create_at']);
             $follow[$key]['update_at'] = date('Y-m-d',$value['update_at']);
+            $follow[$key]['address'] = $value['province'].$value['city'].$value['area'];
+            $follow[$key]['logo'] = Db::name('match')->where(['id'=>$value['match_id']])->value('logo');
+
+
         }
         return self::set_err($follow);
     }
@@ -127,11 +132,15 @@ class MacthService extends Service
     {
         $res = Db::table('eb_article')
             ->where(['status' => 1,'hide' => 0])
-//            ->where('hide',0)
             ->page(1,3)
             ->order('add_time desc')
-//            ->select(['id','cid','title','author','image_input','synopsis','url','add_time']);
             ->select();
+
+
+        foreach($res as $k=>$v){
+            $res[$k]['add_time']=date("Y-m-d",$v['add_time']);
+        }
+
         return  self::set_err($res);
     }
 
@@ -143,8 +152,8 @@ class MacthService extends Service
     public static function addComment($data)
     {
         if(
-           (!isset($data['match_id']) || !$data['match_id']) ||
-           (!isset($data['user_name']) || !$data['user_name'])
+            (!isset($data['match_id']) || !$data['match_id']) ||
+            (!isset($data['user_name']) || !$data['user_name'])
         ){
             return self::set_err([],'1','缺少相关参数数据');
         }
@@ -153,10 +162,10 @@ class MacthService extends Service
         $comment->user_id = $data['user_id']??"0";
         $comment->user_name = $data['user_name'];
         $comment->comment = $data['comment'];
-       if( $comment->save() === false){
-           return self::set_err([],'1','评论发布失败');
-       }
-       return self::set_err();
+        if( $comment->save() === false){
+            return self::set_err([],'1','评论发布失败');
+        }
+        return self::set_err();
     }
 
     /**
@@ -167,7 +176,7 @@ class MacthService extends Service
     public static function queryComment($data)
     {
         if(isset($data['match_id']) && $data['match_id']){ //获取赛事评论列表
-           $where = ['match_id' => $data['match_id']];
+            $where = ['match_id' => $data['match_id']];
         }else if(isset($data['user_id']) && $data['user_id']){ //获取自己所有评论
             $where = ['user_id' => $data['user_id']];
         }else{
