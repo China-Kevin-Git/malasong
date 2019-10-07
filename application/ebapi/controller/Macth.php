@@ -260,9 +260,9 @@ class Macth extends Controller
             $match['match_red']=Db::name('match_red')->field("red_id,spec_name,price")->where(['match_id'=>$data['id']])->select();
             $match['content']=Db::name('match')->where(['id'=>$data['id']])->value('content');
         }elseif ($data['type']==3){
-            $match['meal']=Db::name('match_meal')->field("meal_id,title,price,logo,content")->where(['match_id'=>$data['id']])->page($data['page'],10)->select();
+            $match['meal']=Db::name('match_meal')->field("meal_id,title,price,logo,content")->where(['match_id'=>$data['id']])->select();
         }elseif ($data['type']==4){
-            $match['match_goods']=Db::name('match_goods')->field("service_id,goods_name,price,logo,market_price")->where(['match_id'=>$data['id']])->page($data['page'],10)->select();
+            $match['match_goods']=Db::name('match_goods')->field("service_id,goods_name,price,logo,market_price")->where(['match_id'=>$data['id']])->select();
         }
 
         return self::asJson($match);
@@ -280,6 +280,7 @@ class Macth extends Controller
         $month_end = mktime(23, 59, 59, date('m', strtotime($data['month']))+1, 00);
 
         $match = Db::name('match')->where("match_starat","BETWEEN",[$month_start,$month_end])->order("match_starat")->select();
+        $array=[];
         foreach ($match as $k=>$v){
             $date['start'] = strtotime( date('Y-m-d 00:00:00',$v['match_starat']));
             $date['stop']  = strtotime(date('Y-m-d 23:59:59',$v['match_starat']));
@@ -311,18 +312,28 @@ class Macth extends Controller
     public function sign()
     {
         $data = input("post");
+        $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+        $match_name = Db::name("match")->where(['id'=>$data['match_id']])->value("match_name");
+        $pricee = Db::name("match")->where(['match_id'=>$data['match_id'],'red_id'=>$data['red_id']])->value("price");
+
+        if(empty($data['meal_id'])){
+            $data['meal_id']=0;
+        }
+
+
+        $order_price=$pricee;
 
         $add=[
             "uid"=>$data["uid"],
             "match_id"=>$data["match_id"],
-            "order_price"=>$data["uid"],
-            "match_order_sn"=>$data["uid"],
+            "order_price"=>$order_price,
+            "match_order_sn"=>$str,
             "add_time"=>time(),
-            "match_name"=>$data["uid"],
+            "match_name"=>$match_name,
             "remarks"=>$data["remarks"],
             "red_id"=>$data["uid"],
-            "meal_id"=>$data["uid"],
-            "service_id"=>$data["uid"],
+            "meal_id"=>$data["meal_id"],
+            "service_id"=>$data["service_id"],
         ];
         $match = Db::name("match_order")->insert($add);
         return self::asJson($match);
