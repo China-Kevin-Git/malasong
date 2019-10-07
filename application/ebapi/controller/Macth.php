@@ -360,10 +360,53 @@ class Macth extends Controller
         $data = input("post.");
 
         Db::name("match_means")->insert($data);
-        Db::name("match_order")->where(['match_order_id'=>$data['match_order_id']])->update(["status"=>2]);
+        Db::name("match_order")->where(['match_order_id'=>$data['match_order_id']])->update(["status"=>3]);
         return self::asJson();
     }
 
+    /**
+     * 我的参赛
+     */
+    public function competition(){
+        $data = input("post.");
+        //type 1 全部 2 未支付  3 待完善 4 报名成功
+
+        if($data['type']==1){
+            $where="1=1";
+        }elseif($data['type']==2){
+            $where=["is_pay"=>0];
+        }elseif($data['type']==3){
+            $where=["is_pay"=>1,"status"=>1];
+        }elseif($data['type']==4){
+            $where=["is_pay"=>1,"status"=>3];
+        }
+
+        $match_order = Db::name("match_order")
+            ->field("match_id,order_price,is_pay,status,add_time,match_name")
+            ->where("uid",'=',$data['user_id'])
+            ->where($where)
+            ->order("add_time desc")
+            ->page($data["page"],10)
+            ->select();
+
+        foreach($match_order as $k=>$v){
+            $match_order[$k]['add_time']=date("Y--m-d",$v['add_time']);
+            $match_order[$k]['logo']=Db::name("match")->where(['id'=>$v['match_id']])->value("logo");
+            if($v['is_pay']==0){
+                $match_order[$k]['status_name']="未支付";
+                $match_order[$k]['is_static']=1;
+            }elseif($v['is_pay']==1 && $v['status']==1){
+                $match_order[$k]['status_name']="待完善";
+                $match_order[$k]['is_static']=2;
+            }elseif($v['is_pay']==1 && $v['status']==3){
+                $match_order[$k]['status_name']="报名成功";
+                $match_order[$k]['is_static']=3;
+            }
+        }
+
+        return self::asJson($match_order);
+
+    }
 
 
 }
