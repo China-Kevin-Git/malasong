@@ -10,18 +10,19 @@ class AuthController extends Basic
 
     protected $action = [
         "index",
-        "matchCount",
-        "queryMatch",
-        "queryFollow",
+        "matchcount",
+        "querymatch",
+        "queryfollow",
         "article",
         "article",
         "allMacth",
-        "macthCatgory",
+        "macthcatgory",
         "details",
-        "detailsContent",
+        "detailscontent",
         "month",
         "search",
-        "orderPrice",
+        "orderprice",
+        "homeindex",
 
     ];
 
@@ -35,5 +36,17 @@ class AuthController extends Basic
             $this->uid=isset($this->userInfo['uid']) ? $this->userInfo['uid'] : 0;
         }
 
+    }
+
+    /**
+     * 统一返回格式
+     * @param array $data
+     * @param string $code
+     * @param string $msg
+     * @return array
+     */
+    public static function asJson($data = [],$code = 200,$msg = 'ok')
+    {
+        return json_encode(['data' => $data,'code' => $code,'msg' => $msg]);
     }
 }

@@ -4,6 +4,7 @@ namespace app\ebapi\controller;
 
 use app\ebapi\model\article\Article AS ArticleModel;
 use app\ebapi\model\article\ArticleCategory;
+use think\Db;
 
 /**
  * TODO 小程序文章api接口
@@ -69,5 +70,20 @@ class ArticleApi extends Basic
         $content['add_time'] = date('Y-m-d H:i:s',$content['add_time']);
         ArticleModel::edit(['visit'=>$content["visit"]],$id);//增加浏览次数
         return $this->successful($content);
+    }
+
+    /**
+     * 资讯首页
+     */
+    public function get_article()
+    {
+        $data["banner"] = Db::name("article")->where(["is_banner"=>1])->order("add_time desc")->limit(0,3)->column("image_input");
+        $data["article_category"] = Db::name("article_category")->field("id,title")->where(["is_del"=>0])->order("sort")->select();
+        $data["article"] = Db::name("article")->field("id as article_id,title,image_input,add_time")->where(["hide"=>0])->order("add_time desc")->limit(0,3)->select();
+        foreach ($data['article'] as $k=>$v){
+            $data['article'][$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+        }
+        return $this->successful($data);
+
     }
 }
