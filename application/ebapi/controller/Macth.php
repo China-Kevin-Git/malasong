@@ -332,7 +332,8 @@ class Macth extends AuthController
         if(empty($data['service_id'])){
             $data['service_id']=0;
         }else{
-            $service_id=json_decode($data['service_id']);
+            $cart=stripslashes(html_entity_decode($data['service_id']));
+            $service_id=json_decode($cart);
             foreach ($service_id as $k=>$v){
                 $match_goods = Db::name("match_goods")->where(['service_id'=>$v->service_id])->value("price");
                 $match_goods_price+=$match_goods*$v->num;
@@ -342,6 +343,7 @@ class Macth extends AuthController
 
         }
         $order_price=$pricee+$meal_price+$match_goods_price;
+        $order_price=0.01;
 
         $add=[
             "uid"=>$this->uid,
@@ -436,7 +438,10 @@ class Macth extends AuthController
         if(empty($data['service_id'])){
             $data['service_id']=0;
         }else{
-            $service_id=json_decode($data['service_id']);
+
+            $cart=stripslashes(html_entity_decode($data['service_id']));
+            $service_id=json_decode($cart);
+
             foreach ($service_id as $k=>$v){
                 $match_goods = Db::name("match_goods")->where(['service_id'=>$v->service_id])->value("price");
                 $match_goods_price+=$match_goods*$v->num;
@@ -446,6 +451,21 @@ class Macth extends AuthController
 
         return self::asJson($order_price);
 
+    }
+
+
+
+    /**
+     * 获取赛是分类
+     */
+    public function crfy(){
+        $data = input("post.");
+
+        $match_catrgory_id =  Db::name("match")->where(["id"=>$data['id']])->value("match_catrgory_id");
+
+        $match_catrgory = Db::name("match_catrgory")->where(['id'=>$match_catrgory_id])->find();
+
+        return self::asJson($match_catrgory);
     }
 
 

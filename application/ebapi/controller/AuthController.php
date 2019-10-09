@@ -23,6 +23,7 @@ class AuthController extends Basic
         "search",
         "orderprice",
         "homeindex",
+        "crfy",
 
     ];
 

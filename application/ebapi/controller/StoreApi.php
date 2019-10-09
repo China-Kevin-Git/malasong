@@ -134,9 +134,9 @@ class StoreApi extends AuthController
         $storeInfo['description'] = preg_replace_callback('#<img.*?src="([^"]*)"[^>]*>#i',function ($imagsSrc){
             return isset($imagsSrc[1]) && isset($imagsSrc[0]) ? str_replace($imagsSrc[1],str_replace('\\','/',$imagsSrc[1]),$imagsSrc[0]): '';
         },$storeInfo['description']);
-        $storeInfo['userCollect'] = StoreProductRelation::isProductRelation($id,$this->userInfo['uid'],'collect');
+        $storeInfo['userCollect'] = StoreProductRelation::isProductRelation($id,$this->uid,'collect');
         list($productAttr,$productValue) = StoreProductAttr::getProductAttrDetail($id);
-        setView($this->userInfo['uid'],$id,$storeInfo['cate_id'],'viwe');
+        setView($this->uid,$id,$storeInfo['cate_id'],'viwe');
         $data['storeInfo'] = StoreProduct::setLevelPrice($storeInfo,$this->uid,true);
         $data['similarity'] = StoreProduct::cateIdBySimilarityProduct($storeInfo['cate_id'],'id,store_name,image,price,sales,ficti',4);
         $data['productAttr'] = $productAttr;
@@ -356,14 +356,21 @@ class StoreApi extends AuthController
         if(!$count) return JsonService::fail('参数错误');
         $name = $id.'_'.$this->userInfo['uid'].'_'.$this->userInfo['is_promoter'].'_product.jpg';
         $imageInfo = SystemAttachment::getInfo($name,'name');
+        $imageInfo["image_type"] = 1 ;
         $siteUrl = SystemConfigService::get('site_url').DS;
+
         if(!$imageInfo){
             $data='id='.$id;
             if($this->userInfo['is_promoter'] || SystemConfigService::get('store_brokerage_statu')==2) $data.='&pid='.$this->uid;
+
+
             $res = RoutineCode::getPageCode('pages/goods_details/index',$data,280);
+
             if(!$res) return JsonService::fail('二维码生成失败');
             $imageInfo = UploadService::imageStream($name,$res,'routine/product');
+
             if(!is_array($imageInfo)) return JsonService::fail($imageInfo);
+
             if($imageInfo['image_type'] == 1) $remoteImage = UtilService::remoteImage($siteUrl.$imageInfo['dir']);
             else $remoteImage = UtilService::remoteImage($imageInfo['dir']);
             if(!$remoteImage['status']) return JsonService::fail($remoteImage['msg']);

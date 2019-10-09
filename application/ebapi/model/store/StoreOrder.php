@@ -379,8 +379,7 @@ class StoreOrder extends ModelBasic
     //TODO JS支付
     public static function jsPay($orderId,$field = 'order_id')
     {
-
-        if(strpos($orderId["match_order_sn"],'match-') !==false){
+        if(!empty($orderId["match_order_sn"])){
             $orderInfo['order_id']=$orderId["match_order_sn"];
             $orderInfo['pay_price']=$orderId["order_price"];
             $orderInfo['uid']=$orderId["uid"];

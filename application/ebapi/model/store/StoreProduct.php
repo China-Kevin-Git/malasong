@@ -20,11 +20,11 @@ class StoreProduct extends ModelBasic
 
     protected function getSliderImageAttr($value)
     {
-         $sliderImage=json_decode($value,true)?:[];
-         foreach ($sliderImage as &$item){
-             $item=str_replace('\\','/',$item);
-         }
-         return $sliderImage;
+        $sliderImage=json_decode($value,true)?:[];
+        foreach ($sliderImage as &$item){
+            $item=str_replace('\\','/',$item);
+        }
+        return $sliderImage;
     }
 
     protected function getImageAttr($value)
@@ -34,9 +34,9 @@ class StoreProduct extends ModelBasic
 
     public static function getValidProduct($productId,$field = 'add_time,browse,cate_id,code_path,cost,description,ficti,give_integral,id,image,is_bargain,is_benefit,is_best,is_del,is_hot,is_new,is_postage,is_seckill,is_show,keyword,mer_id,mer_use,ot_price,postage,price,sales,slider_image,sort,stock,store_info,store_name,unit_name,vip_price,ficti as fsales')
     {
-         $Product=self::where('is_del',0)->where('is_show',1)->where('id',$productId)->field($field)->find();
-         if($Product) return $Product->toArray();
-         else return false;
+        $Product=self::where('is_del',0)->where('is_show',1)->where('id',$productId)->field($field)->find();
+        if($Product) return $Product->toArray();
+        else return false;
     }
 
     public static function validWhere()
@@ -56,7 +56,8 @@ class StoreProduct extends ModelBasic
         $limit = $data['limit'];
         $model = self::validWhere();
         if($sId){
-            $product_ids=self::getDb('store_product_cate')->where('cate_id',$sId)->column('product_id');
+            //            $product_ids=self::getDb('store_product_cate')->where('cate_id',$sId)->column('product_id');
+            $product_ids=self::getDb('store_product')->where('cate_id',$sId)->column('id');
             if(count($product_ids))
                 $model=$model->where('id',"in",$product_ids);
             else
