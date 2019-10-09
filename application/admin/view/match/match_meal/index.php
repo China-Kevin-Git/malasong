@@ -8,7 +8,7 @@
 
             <div class="ibox-title">
 
-                <button type="button" class="btn btn-w-m btn-primary add-filed">添加赛事分类</button>
+                <button type="button" class="btn btn-w-m btn-primary add-filed">添加套餐</button>
 
             </div>
             <div class="ibox-content">
@@ -27,12 +27,10 @@
                         <tr>
 
                             <th>编号</th>
-
-                            <th>分类昵称</th>
-
-                            <th>赛事结束时间</th>
-                            <th>报名截止时间</th>
-                            <th>地址</th>
+                            <th>赛事套餐标题</th>
+                            <th>赛事名称</th>
+                            <th>套餐价格</th>
+                            <th>图片</th>
 
                             <th>操作</th>
 
@@ -44,7 +42,12 @@
                         {volist name="list" id="vo"}
                         <tr>
                             <td class="text-center">
-                                {$vo.id}
+                                {$vo.meal_id}
+                            </td>
+
+                            <td class="text-center">
+                                {$vo.title}
+
                             </td>
 
                             <td class="text-center">
@@ -53,26 +56,21 @@
                             </td>
 
                             <td class="text-center">
-                                {$vo.match_stop}
+                                {$vo.price}
 
                             </td>
 
-                            <td class="text-center">
-                                {$vo.enroll_time}
-
-                            </td>
-
-                            <td class="text-center">
-                                {$vo.address}
+                            <td class="text-center" height="6%">
+                                <img src="{$vo.logo}" width="10%">
 
                             </td>
 
                             <td class="text-center">
 
-                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('编辑','{:Url('edit',array('id'=>$vo['id']))}')"><i class="fa fa-paste"></i> 编辑</button>
+                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('编辑','{:Url('edit',array('id'=>$vo['meal_id']))}')"><i class="fa fa-paste"></i> 编辑</button>
 
-                                <button class="btn btn-warning btn-xs del_config_tab" data-id="{$vo.id}" type="button" data-url="{:Url('delete',array('id'=>$vo['id']))}" ><i class="fa fa-warning"></i> 删除</button>
-                                <a type="button" class="btn btn-info btn-xs"  onclick="$eb.createModalFrame(this.innerText,'{:Url('edit_content')}?id={$vo['id']}')"> <i class="fa fa-paste"></i> 详情</a>
+                                <button class="btn btn-warning btn-xs del_config_tab" data-id="{$vo.meal_id}" type="button" data-url="{:Url('delete',array('id'=>$vo['meal_id']))}" ><i class="fa fa-warning"></i> 删除</button>
+                                <a type="button" class="btn btn-info btn-xs"  onclick="$eb.createModalFrame(this.innerText,'{:Url('edit_content')}?id={$vo['meal_id']}')"> <i class="fa fa-paste"></i> 详情</a>
 
 
                             </td>

@@ -8,7 +8,7 @@
 
             <div class="ibox-title">
 
-                <button type="button" class="btn btn-w-m btn-primary add-filed">添加赛事分类</button>
+                <button type="button" class="btn btn-w-m btn-primary add-filed">添加可选服务</button>
 
             </div>
             <div class="ibox-content">
@@ -27,12 +27,11 @@
                         <tr>
 
                             <th>编号</th>
-
-                            <th>分类昵称</th>
-
-                            <th>赛事结束时间</th>
-                            <th>报名截止时间</th>
-                            <th>地址</th>
+                            <th>可选服务商品名</th>
+                            <th>logo</th>
+                            <th>现价</th>
+                            <th>市场价格</th>
+                            <th>赛事名字</th>
 
                             <th>操作</th>
 
@@ -44,7 +43,27 @@
                         {volist name="list" id="vo"}
                         <tr>
                             <td class="text-center">
-                                {$vo.id}
+                                {$vo.service_id}
+                            </td>
+
+                            <td class="text-center">
+                                {$vo.goods_name}
+
+                            </td>
+
+                            <td class="text-center" height="6%">
+                               <img src="{$vo.logo}" width="10%">
+
+                            </td>
+
+                            <td class="text-center">
+                                {$vo.price}
+
+                            </td>
+
+                            <td class="text-center">
+                                {$vo.market_price}
+
                             </td>
 
                             <td class="text-center">
@@ -53,26 +72,10 @@
                             </td>
 
                             <td class="text-center">
-                                {$vo.match_stop}
 
-                            </td>
+                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('编辑','{:Url('edit',array('id'=>$vo['service_id']))}')"><i class="fa fa-paste"></i> 编辑</button>
 
-                            <td class="text-center">
-                                {$vo.enroll_time}
-
-                            </td>
-
-                            <td class="text-center">
-                                {$vo.address}
-
-                            </td>
-
-                            <td class="text-center">
-
-                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('编辑','{:Url('edit',array('id'=>$vo['id']))}')"><i class="fa fa-paste"></i> 编辑</button>
-
-                                <button class="btn btn-warning btn-xs del_config_tab" data-id="{$vo.id}" type="button" data-url="{:Url('delete',array('id'=>$vo['id']))}" ><i class="fa fa-warning"></i> 删除</button>
-                                <a type="button" class="btn btn-info btn-xs"  onclick="$eb.createModalFrame(this.innerText,'{:Url('edit_content')}?id={$vo['id']}')"> <i class="fa fa-paste"></i> 详情</a>
+                                <button class="btn btn-warning btn-xs del_config_tab" data-id="{$vo.service_id}" type="button" data-url="{:Url('delete',array('id'=>$vo['service_id']))}" ><i class="fa fa-warning"></i> 删除</button>
 
 
                             </td>

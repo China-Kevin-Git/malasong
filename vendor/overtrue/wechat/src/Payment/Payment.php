@@ -266,6 +266,7 @@ class Payment
             'noncestr' => uniqid(),
             'timestamp' => time(),
             'package' => 'Sign=WXPay',
+
         ];
 
         $params['sign'] = generate_sign($params, $this->merchant->key);

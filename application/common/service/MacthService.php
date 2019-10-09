@@ -130,15 +130,15 @@ class MacthService extends Service
      */
     public static function queryArticle()
     {
-        $res = Db::table('eb_article')
+        $res["article"] = Db::table('eb_article')
             ->where(['status' => 1,'hide' => 0])
             ->page(1,3)
             ->order('add_time desc')
             ->select();
+        $res["category"] = Db::name("article_category")->field("id,title")->select();
 
-
-        foreach($res as $k=>$v){
-            $res[$k]['add_time']=date("Y-m-d",$v['add_time']);
+        foreach($res["article"] as $k=>$v){
+            $res["article"][$k]['add_time']=date("Y-m-d",$v['add_time']);
         }
 
         return  self::set_err($res);
