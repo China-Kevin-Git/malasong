@@ -77,13 +77,26 @@ class ArticleApi extends Basic
      */
     public function get_article()
     {
+
         $data["banner"] = Db::name("article")->where(["is_banner"=>1])->order("add_time desc")->limit(0,3)->column("image_input");
         $data["article_category"] = Db::name("article_category")->field("id,title")->where(["is_del"=>0])->order("sort")->select();
-        $data["article"] = Db::name("article")->field("id as article_id,title,image_input,add_time")->where(["hide"=>0])->order("add_time desc")->limit(0,3)->select();
-        foreach ($data['article'] as $k=>$v){
-            $data['article'][$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+        return $this->successful($data);
+    }
+
+    /**
+     * 资讯首页文章
+     */
+    public function article_desc()
+    {
+        $data=input("post.");
+        $data = Db::name("article")->field("id as article_id,title,image_input,add_time")->where(["hide"=>0,"cid"=>$data["cid"]])->order("add_time desc")->limit(0,3)->select();
+        foreach ($data as $k=>$v){
+            $data[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
         }
         return $this->successful($data);
-
     }
+
+
+
+
 }
