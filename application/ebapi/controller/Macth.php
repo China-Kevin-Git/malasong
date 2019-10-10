@@ -207,13 +207,13 @@ class Macth extends AuthController
         }
 
         $match=Db::name('match')
-            ->field('a.id,a.match_name,a.province,a.city,a.match_starat,a.logo,b.follow_num')
-            ->alias('a')
-            ->join('match_follow b','a.id=b.match_id')
-            ->where($where)
-            ->order($order)
-            ->page($data['page'],10)
-            ->select();
+                 ->field('a.id,a.match_name,a.province,a.city,a.match_starat,a.logo,b.follow_num')
+                 ->alias('a')
+                 ->join('match_follow b','a.id=b.match_id')
+                 ->where($where)
+                 ->order($order)
+                 ->page($data['page'],10)
+                 ->select();
         foreach ($match as $k=>$v){
             $match[$k]['address']=$v['province'].$v['city'];
             $match[$k]['match_starat']=date('Y-m-d',$v['match_starat']);
@@ -230,7 +230,7 @@ class Macth extends AuthController
      */
     public function macthCatgory(){
         $match=Db::name('match_catrgory')
-            ->select();
+                 ->select();
         return self::asJson($match);
 
     }
@@ -346,16 +346,16 @@ class Macth extends AuthController
         $order_price=0.01;
 
         $add=[
-            "uid"=>$this->uid,
-            "match_id"=>$data["match_id"],
-            "order_price"=>$order_price,
-            "match_order_sn"=>$str,
-            "add_time"=>time(),
-            "match_name"=>$match_name,
-            "remarks"=>$data["remarks"],
-            "red_id"=>$data["red_id"],
-            "meal_id"=>$data["meal_id"],
-            "service_id"=>$data["service_id"],
+          "uid"=>$this->uid,
+          "match_id"=>$data["match_id"],
+          "order_price"=>$order_price,
+          "match_order_sn"=>$str,
+          "add_time"=>time(),
+          "match_name"=>$match_name,
+          "remarks"=>$data["remarks"],
+          "red_id"=>$data["red_id"],
+          "meal_id"=>$data["meal_id"],
+          "service_id"=>$data["service_id"],
         ];
         Db::name("match_order")->insert($add);
 
@@ -392,12 +392,12 @@ class Macth extends AuthController
         }
 
         $match_order = Db::name("match_order")
-            ->field("match_id,order_price,is_pay,status,add_time,match_name")
-            ->where("uid",'=',$this->uid)
-            ->where($where)
-            ->order("add_time desc")
-            ->page($data["page"],10)
-            ->select();
+                         ->field("match_id,order_price,is_pay,status,add_time,match_name")
+                         ->where("uid",'=',$this->uid)
+                         ->where($where)
+                         ->order("add_time desc")
+                         ->page($data["page"],10)
+                         ->select();
 
         foreach($match_order as $k=>$v){
             $match_order[$k]['add_time']=date("Y/m/d",$v['add_time']);
@@ -488,11 +488,11 @@ class Macth extends AuthController
         $data = input("post.");
 
         $comment = Db::name("article_comment")
-            ->field("uid,content,add_time")
-            ->where(["artilce_id"=>$data["artilce_id"]])
-            ->order("add_time desc")
-            ->page($data["page"],$data["size"])
-            ->select();
+                     ->field("uid,content,add_time")
+                     ->where(["artilce_id"=>$data["artilce_id"]])
+                     ->order("add_time desc")
+                     ->page($data["page"],$data["size"])
+                     ->select();
         foreach ($comment as $k=>$v){
             $user=Db::name("user")->where("uid","=",$v["uid"])->find();
             $comment[$k]["nickname"] = $user["nickname"];
