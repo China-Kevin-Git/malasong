@@ -13,6 +13,7 @@ use app\ebapi\model\user\UserRecharge;
 use service\HookService;
 use app\core\util\MiniProgramService;
 use app\core\util\WechatService;
+use think\Db;
 
 //待完善
 class PaymentBehavior
@@ -67,12 +68,26 @@ class PaymentBehavior
     public static function wechatPaySuccessProductr($orderId, $notify)
     {
         try{
+
+            //处理业务逻辑
+            if (stripos($orderId, 'match-') !== false){
+                $match_order =   Db::name("match_order")->where(["match_order_sn"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
+                if($match_order){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
             if(StoreOrderRoutineModel::be(['order_id'=>$orderId,'paid'=>1])) return true;
             return StoreOrderRoutineModel::paySuccess($orderId);
         }catch (\Exception $e){
             return false;
         }
     }
+
+
+
+
 
     /**
      * 用户充值成功后

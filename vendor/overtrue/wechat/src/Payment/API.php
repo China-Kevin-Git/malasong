@@ -125,6 +125,7 @@ class API extends AbstractAPI
     public function prepare(Order $order)
     {
         $order->notify_url = $order->get('notify_url', $this->merchant->notify_url);
+
         if (is_null($order->spbill_create_ip)) {
             $order->spbill_create_ip = (Order::NATIVE === $order->trade_type) ? get_server_ip() : get_client_ip();
         }

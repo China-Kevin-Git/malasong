@@ -469,4 +469,39 @@ class Macth extends AuthController
     }
 
 
+
+    /**
+     * 文章评论
+     */
+    public function article_commen(){
+        $data = input("post.");
+        $data["uid"] = $this->uid;
+        $data["add_time"] = time();
+        Db::name("article_comment")->insert($data);
+        return self::asJson();
+    }
+
+    /**
+     * 文章评论
+     */
+    public function article_index(){
+        $data = input("post.");
+
+        $comment = Db::name("article_comment")
+            ->field("uid,content,add_time")
+            ->where(["artilce_id"=>$data["artilce_id"]])
+            ->order("add_time desc")
+            ->page($data["page"],$data["size"])
+            ->select();
+        foreach ($comment as $k=>$v){
+            $user=Db::name("user")->where("uid","=",$v["uid"])->find();
+            $comment[$k]["nickname"] = $user["nickname"];
+            $comment[$k]["avatar"] = $user["avatar"];
+            $comment[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+        }
+
+
+        return self::asJson($comment);
+    }
+
 }
