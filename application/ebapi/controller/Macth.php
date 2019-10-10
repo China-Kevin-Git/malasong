@@ -275,7 +275,7 @@ class Macth extends AuthController
      */
     public function month(){
         $data = input("post.");
-        $data['month']=str_replace('年','-',$data['month']);
+        $data['month']=str_replace('年','/',$data['month']);
         $data['month']=str_replace('月','',$data['month']);
         $month_start = strtotime($data['month']);//指定月份月初时间戳
         $month_end = mktime(23, 59, 59, date('m', strtotime($data['month']))+1, 00);
@@ -400,7 +400,7 @@ class Macth extends AuthController
             ->select();
 
         foreach($match_order as $k=>$v){
-            $match_order[$k]['add_time']=date("Y--m-d",$v['add_time']);
+            $match_order[$k]['add_time']=date("Y/m/d",$v['add_time']);
             $match_order[$k]['logo']=Db::name("match")->where(['id'=>$v['match_id']])->value("logo");
             if($v['is_pay']==0){
                 $match_order[$k]['status_name']="未支付";
