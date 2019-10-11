@@ -3,9 +3,7 @@
 namespace app\ebapi\controller;
 
 use app\common\service\MacthService;
-use think\Controller;
 use think\Db;
-use think\exception\ErrorException;
 use think\Request;
 
 /**
@@ -207,13 +205,13 @@ class Macth extends AuthController
         }
 
         $match=Db::name('match')
-                 ->field('a.id,a.match_name,a.province,a.city,a.match_starat,a.logo,b.follow_num')
-                 ->alias('a')
-                 ->join('match_follow b','a.id=b.match_id')
-                 ->where($where)
-                 ->order($order)
-                 ->page($data['page'],10)
-                 ->select();
+            ->field('a.id,a.match_name,a.province,a.city,a.match_starat,a.logo,b.follow_num')
+            ->alias('a')
+            ->join('match_follow b','a.id=b.match_id')
+            ->where($where)
+            ->order($order)
+            ->page($data['page'],10)
+            ->select();
         foreach ($match as $k=>$v){
             $match[$k]['address']=$v['province'].$v['city'];
             $match[$k]['match_starat']=date('Y-m-d',$v['match_starat']);
@@ -230,7 +228,7 @@ class Macth extends AuthController
      */
     public function macthCatgory(){
         $match=Db::name('match_catrgory')
-                 ->select();
+            ->select();
         return self::asJson($match);
 
     }
@@ -275,7 +273,7 @@ class Macth extends AuthController
      */
     public function month(){
         $data = input("post.");
-        $data['month']=str_replace('年','/',$data['month']);
+        $data['month']=str_replace('年','-',$data['month']);
         $data['month']=str_replace('月','',$data['month']);
         $month_start = strtotime($data['month']);//指定月份月初时间戳
         $month_end = mktime(23, 59, 59, date('m', strtotime($data['month']))+1, 00);
@@ -333,29 +331,28 @@ class Macth extends AuthController
             $data['service_id']=0;
         }else{
             $cart=stripslashes(html_entity_decode($data['service_id']));
-            $service_id=json_decode($cart);
+            $service_id=json_decode($cart,true);
             foreach ($service_id as $k=>$v){
-                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->service_id])->value("price");
-                $match_goods_price+=$match_goods*$v->num;
-                Db::name("match_order_goods")->insert(['match_order_sn'=>$str,'num'=>$v->num,'price'=>$match_goods*$v->num,'add_time'=>time(),'service_id'=>$v->service_id]);
+                $match_goods = Db::name("match_goods")->where(['service_id'=>$v["service_id"]])->value("price");
+                $match_goods_price+=$match_goods*$v["num"];
+                Db::name("match_order_goods")->insert(['match_order_sn'=>$str,'num'=>$v["num"],'price'=>$match_goods*$v["num"],'add_time'=>time(),'service_id'=>$v["service_id"]]);
             }
-
 
         }
         $order_price=$pricee+$meal_price+$match_goods_price;
         $order_price=0.01;
 
         $add=[
-          "uid"=>$this->uid,
-          "match_id"=>$data["match_id"],
-          "order_price"=>$order_price,
-          "match_order_sn"=>$str,
-          "add_time"=>time(),
-          "match_name"=>$match_name,
-          "remarks"=>$data["remarks"],
-          "red_id"=>$data["red_id"],
-          "meal_id"=>$data["meal_id"],
-          "service_id"=>$data["service_id"],
+            "uid"=>$this->uid,
+            "match_id"=>$data["match_id"],
+            "order_price"=>$order_price,
+            "match_order_sn"=>$str,
+            "add_time"=>time(),
+            "match_name"=>$match_name,
+            "remarks"=>$data["remarks"],
+            "red_id"=>$data["red_id"],
+            "meal_id"=>$data["meal_id"],
+            "service_id"=>$data["service_id"],
         ];
         Db::name("match_order")->insert($add);
 
@@ -392,15 +389,15 @@ class Macth extends AuthController
         }
 
         $match_order = Db::name("match_order")
-                         ->field("match_id,order_price,is_pay,status,add_time,match_name")
-                         ->where("uid",'=',$this->uid)
-                         ->where($where)
-                         ->order("add_time desc")
-                         ->page($data["page"],10)
-                         ->select();
+            ->field("match_id,order_price,is_pay,status,add_time,match_name")
+            ->where("uid",'=',$this->uid)
+            ->where($where)
+            ->order("add_time desc")
+            ->page($data["page"],10)
+            ->select();
 
         foreach($match_order as $k=>$v){
-            $match_order[$k]['add_time']=date("Y/m/d",$v['add_time']);
+            $match_order[$k]['add_time']=date("Y--m-d",$v['add_time']);
             $match_order[$k]['logo']=Db::name("match")->where(['id'=>$v['match_id']])->value("logo");
             if($v['is_pay']==0){
                 $match_order[$k]['status_name']="未支付";
@@ -440,20 +437,21 @@ class Macth extends AuthController
         }else{
 
             $cart=stripslashes(html_entity_decode($data['service_id']));
-            $service_id=json_decode($cart);
+            $service_id=json_decode($cart,true);
 
             foreach ($service_id as $k=>$v){
-                $match_goods = Db::name("match_goods")->where(['service_id'=>$v->service_id])->value("price");
-                $match_goods_price+=$match_goods*$v->num;
+                $match_goods = Db::name("match_goods")->where(['service_id'=>$v["service_id"]])->value("price");
+                $match_goods_price+=$match_goods*$v["num"];
             }
+
+
+
         }
         $order_price=$pricee+$meal_price+$match_goods_price;
 
         return self::asJson($order_price);
 
     }
-
-
 
     /**
      * 获取赛是分类
@@ -467,8 +465,6 @@ class Macth extends AuthController
 
         return self::asJson($match_catrgory);
     }
-
-
 
     /**
      * 文章评论
@@ -488,11 +484,11 @@ class Macth extends AuthController
         $data = input("post.");
 
         $comment = Db::name("article_comment")
-                     ->field("uid,content,add_time")
-                     ->where(["artilce_id"=>$data["artilce_id"]])
-                     ->order("add_time desc")
-                     ->page($data["page"],$data["size"])
-                     ->select();
+            ->field("uid,content,add_time")
+            ->where(["artilce_id"=>$data["artilce_id"]])
+            ->order("add_time desc")
+            ->page($data["page"],$data["size"])
+            ->select();
         foreach ($comment as $k=>$v){
             $user=Db::name("user")->where("uid","=",$v["uid"])->find();
             $comment[$k]["nickname"] = $user["nickname"];
