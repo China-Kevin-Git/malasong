@@ -28,14 +28,17 @@ class MatchPink extends AuthController
      */
     public function get_combination_list(){
         $data = input("post.");
-        $store_combination = Db::name("match_combination")
-            ->field("image,title,price,start_time")
+        $store_combination["combination"] = Db::name("match_combination")
+            ->field("id,image,title,price,start_time")
             ->where(['is_show'=>1,"is_del"=>0])
             ->page($data['page'],10)
             ->select();
-        foreach ($store_combination as $k=>$v){
-            $store_combination[$k]['start_time'] = date("Y-m-d",$v['start_time']);
+        foreach ($store_combination["combination"] as $k=>$v){
+            $store_combination["combination"][$k]['start_time'] = date("Y-m-d",$v['start_time']);
         }
+        $store_combination["banner"]=[
+          "http://chinb.org/system/images/20191012003902.png"
+        ];
         return JsonService::successful($store_combination);
     }
 
