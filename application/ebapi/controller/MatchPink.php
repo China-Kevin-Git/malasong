@@ -71,7 +71,6 @@ class MatchPink extends AuthController
         return JsonService::successful($data);
     }
 
-
     /**
      * 获取赛事拼团用户
      */
@@ -94,7 +93,6 @@ class MatchPink extends AuthController
     /**
      * 生产拼团订单
      */
-
     public function pinkOrder()
     {
         $data = input("post.");
@@ -116,10 +114,6 @@ class MatchPink extends AuthController
         return JsonService::successful($str);
 
     }
-
-
-
-
 
     /**
      * 开团页面
@@ -245,6 +239,27 @@ class MatchPink extends AuthController
         }catch (\Exception $e){
             return JsonService::fail('系统错误：生成图片失败',['line'=>$e->getLine(),'message'=>$e->getMessage()]);
         }
+
+    }
+
+    /**
+     * 获取拼单订单列表
+     */
+    public function pinkList()
+    {
+        $data = input("post.");
+
+       $match_pink=Db::name("match_pink")
+            ->field("id,cid,add_time,total_price")
+            ->page($data["page"],$data["size"])
+            ->select();
+       foreach($match_pink as $k=>$v){
+           $match_pink[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+           $match_pink[$k]["images"] = Db::name("match_combination")->where(["product_id"=>$v["cid"]])->value("image");
+           $match_pink[$k]["title"] = Db::name("match_combination")->where(["product_id"=>$v["cid"]])->value("title");
+       }
+
+        return JsonService::successful($match_pink);
 
     }
 
