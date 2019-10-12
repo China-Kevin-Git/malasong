@@ -78,6 +78,16 @@ class PaymentBehavior
                     return false;
                 }
             }
+            //处理业务逻辑
+            if (stripos($orderId, 'pink-') !== false){
+                $match_order =   Db::name("match_pink")->where(["order_id"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
+                if($match_order){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+
             if(StoreOrderRoutineModel::be(['order_id'=>$orderId,'paid'=>1])) return true;
             return StoreOrderRoutineModel::paySuccess($orderId);
         }catch (\Exception $e){

@@ -99,17 +99,21 @@ class MatchPink extends AuthController
     {
         $data = input("post.");
         $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
-        $combination = Db::name("match_combination")->field("product_id,people,price")->when(["id"=>$data["id"]])->find();
+        $combination = Db::name("match_combination")->field("product_id,people,price,stop_time")->where(["id"=>$data["id"]])->find();
         $array = [
             "uid"=>$this->uid,
             "order_id"=>$str,
-            "total_price"=>$combination["people"],
+            "total_price"=>$combination["price"],
+            "price"=>$combination["price"],
+            "people"=>$combination["people"],
             "cid"=>$combination["product_id"],
             "pid"=>$combination["product_id"],
             "add_time"=>time(),
+            "stop_time"=>$combination["stop_time"],
+            "k_id"=>$data["k_id"],
         ];
         Db::name("match_pink")->insert($array);
-        return JsonService::successful();
+        return JsonService::successful($str);
 
     }
 

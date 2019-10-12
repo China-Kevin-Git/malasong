@@ -289,8 +289,15 @@ class AuthApi extends AuthController
         if (!$uni) return JsonService::fail('参数错误!');
 
         if(strpos($uni,'match-') !==false){
+            //赛事订单
             $order = Db::name("match_order")->where(['match_order_sn'=>$uni])->find();
             $order['order_id'] = $order["match_id"];
+            if (!$order) return JsonService::fail('订单不存在!');
+            if ($order['is_pay']) return JsonService::fail('该订单已支付!');
+
+        }elseif(strpos($uni,'pink-') !==false){
+            //拼团订单
+            $order = Db::name("match_pink")->where(['order_id'=>$uni])->find();
             if (!$order) return JsonService::fail('订单不存在!');
             if ($order['is_pay']) return JsonService::fail('该订单已支付!');
 
@@ -299,7 +306,6 @@ class AuthApi extends AuthController
             if (!$order) return JsonService::fail('订单不存在!');
             if ($order['paid']) return JsonService::fail('该订单已支付!');
             if ($order['pink_id']) if (StorePink::isPinkStatus($order['pink_id'])) return JsonService::fail('该订单已失效!');
-
         }
 
         $order['pay_type'] = $paytype; //重新支付选择支付方式
