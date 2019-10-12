@@ -65,6 +65,7 @@ class MatchPink extends AuthController
         $match = Db::name("match")->where(["id"=>$data["product_id"]])->find();
 
         $data['content'] = $match['content'];
+        $data['address'] = $match['province'].$match['city'].$match['area'];
         $data['match_starat'] = date("Y-m-d",$match['match_starat']);
 
         return JsonService::successful($data);
@@ -88,6 +89,27 @@ class MatchPink extends AuthController
 
         $match_pink["pinkNum"] = Db::name("store_pink")->where(["cid"=>$data["id"],"k_id"=>0])->count();
         return JsonService::successful($match_pink);
+    }
+
+    /**
+     * 生产拼团订单
+     */
+
+    public function pinkOrder()
+    {
+        $data = input("post.");
+        $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+        $combination = Db::name("match_combination")->field("product_id,people,price")->when(["id"=>$data["id"]])->find();
+        $array = [
+            "uid"=>$this->uid,
+            "order_id"=>$str,
+            "total_price"=>$combination["people"],
+            "cid"=>$combination["product_id"],
+            "pid"=>$combination["product_id"],
+            "add_time"=>time(),
+        ];
+        Db::name("match_pink")->insert($array);
+        return JsonService::successful();
 
     }
 
