@@ -24,6 +24,7 @@ class AuthController extends Basic
         "orderprice",
         "homeindex",
         "crfy",
+        "get_combination_list",
 
     ];
 
