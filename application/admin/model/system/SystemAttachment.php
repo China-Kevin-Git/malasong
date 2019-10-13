@@ -46,7 +46,7 @@ class SystemAttachment extends ModelBasic
     public static function getinfo($att_id){
         $model = new self;
         $where['att_id'] = $att_id;
-        return $model->where($where)->select()->toArray()[0];
+        return $model->where($where)->select()->toArray();
     }
 
 }

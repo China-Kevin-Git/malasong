@@ -211,10 +211,11 @@ class MatchPink extends AuthController
         if($pinkInfo['k_id']) $pinkAll = \app\ebapi\model\match\MatchPink::getPinkMember($pinkInfo['k_id']);
         else $pinkAll = \app\ebapi\model\match\MatchPink::getPinkMember($pinkInfo['id']);
         $count = count($pinkAll)+1;
-        $data['msg'] = '原价￥'.$MatchCombinationInfo['product_price'].' 还差'.(int)bcsub((int)$pinkInfo['people'],$count,0).'人拼团成功';
+        $data['msg'] = '原价￥'.$MatchCombinationInfo['match_price'].' 还差'.(int)bcsub((int)$pinkInfo['people'],$count,0).'人拼团成功';
         try{
             $name = $pinkId.'_'.$this->userInfo['uid'].'_'.$this->userInfo['is_promoter'].'_pink_share.jpg';
             $imageInfo = SystemAttachment::getInfo($name,'name');
+
             $siteUrl = SystemConfigService::get('site_url').DS;
             if(!$imageInfo){
                 $valueData = 'id='.$pinkId;
