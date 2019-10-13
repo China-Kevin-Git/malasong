@@ -39,15 +39,9 @@ class MatchPink extends AuthController
         $store_combination["banner"]=[
           "http://chinb.org/system/images/20191012003902.png"
         ];
-        return JsonService::successful($store_combination);
+        return JsonService::successful('ok',$store_combination);
     }
 
-    /**
-     * TODO 获取拼团列表顶部图
-     */
-    public function get_combination_list_banner(){
-        return JsonService::successful();
-    }
 
     /**
      * TODO 获取赛事拼团产品详情
@@ -68,7 +62,7 @@ class MatchPink extends AuthController
         $data['address'] = $match['province'].$match['city'].$match['area'];
         $data['match_starat'] = date("Y-m-d",$match['match_starat']);
 
-        return JsonService::successful($data);
+        return JsonService::successful('ok',$data);
     }
 
     /**
@@ -87,7 +81,7 @@ class MatchPink extends AuthController
         }
 
         $match_pink["pinkNum"] = Db::name("store_pink")->where(["cid"=>$data["id"],"k_id"=>0])->count();
-        return JsonService::successful($match_pink);
+        return JsonService::successful('ok',$match_pink);
     }
 
     /**
@@ -111,7 +105,8 @@ class MatchPink extends AuthController
             "k_id"=>$data["k_id"],
         ];
         Db::name("match_pink")->insert($array);
-        return JsonService::successful($str);
+        $pay = new AuthApi();
+        $pay->pay_order($str);
 
     }
 
@@ -165,7 +160,7 @@ class MatchPink extends AuthController
         $data['count'] = $count;
         $data['store_combination_host'] = MatchCombination::getCombinationHost();
         $data['current_pink_order'] = \app\ebapi\model\match\MatchPink::getCurrentPink($id,$this->uid);
-        return JsonService::successful($data);
+        return JsonService::successful('ok',$data);
     }
 
     /**
@@ -260,7 +255,7 @@ class MatchPink extends AuthController
            $match_pink[$k]["title"] = Db::name("match_combination")->where(["product_id"=>$v["cid"]])->value("title");
        }
 
-        return JsonService::successful($match_pink);
+        return JsonService::successful('ok',$match_pink);
 
     }
 
