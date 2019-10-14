@@ -323,8 +323,6 @@ class Macth extends AuthController
             $meal_price = Db::name("match_meal")->where(['meal_id'=>$data['meal_id']])->value("price");
         }
 
-
-
         //可选服务
         $match_goods_price=0;
         if(empty($data['service_id'])){
@@ -353,6 +351,7 @@ class Macth extends AuthController
             "red_id"=>$data["red_id"],
             "meal_id"=>$data["meal_id"],
             "service_id"=>$data["service_id"],
+            "address_id"=>$data["address_id"],
         ];
         Db::name("match_order")->insert($add);
 

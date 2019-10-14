@@ -90,21 +90,41 @@ class MatchPink extends AuthController
     public function pinkOrder()
     {
         $data = input("post.");
-        $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
-        $combination = Db::name("match_combination")->field("product_id,people,price,stop_time")->where(["id"=>$data["id"]])->find();
-        $array = [
-            "uid"=>$this->uid,
-            "order_id"=>$str,
-            "total_price"=>$combination["price"],
-            "price"=>$combination["price"],
-            "people"=>$combination["people"],
-            "cid"=>$combination["product_id"],
-            "pid"=>$combination["product_id"],
-            "add_time"=>time(),
-            "stop_time"=>$combination["stop_time"],
-            "k_id"=>$data["k_id"],
-        ];
-        Db::name("match_pink")->insert($array);
+        $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["id"=>$data["id"]])->find();
+        if($data["type"]==1){
+            $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+            $add=[
+                "uid"=>$this->uid,
+                "match_id"=>$combination["product_id"],
+                "order_price"=>$data["amount"],
+                "match_order_sn"=>$str,
+                "add_time"=>time(),
+                "match_name"=>Db::name("match")->where(["id"=>$combination["product_id"]])->value("match_name"),
+            ];
+            Db::name("match_order")->insert($add);
+        }elseif($data["type"]==2){
+            $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+            $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"cid"=>$combination["product_id"],"status"=>1])->count();
+            if(!empty($count)){
+                return JsonService::fail('该赛事您已经在拼团了');
+            }
+            if(empty($data["tid"])){
+                $data["tid"]= 0;
+            }
+            $array = [
+                "uid"=>$this->uid,
+                "order_id"=>$str,
+                "total_price"=>$combination["price"],
+                "price"=>$combination["price"],
+                "people"=>$combination["people"],
+                "cid"=>$combination["id"],
+                "pid"=>$combination["product_id"],
+                "add_time"=>time(),
+                "stop_time"=>$combination["stop_time"],
+                "k_id"=>$data["tid"],
+            ];
+            Db::name("match_pink")->insert($array);
+        }
         $pay = new AuthApi();
         $pay->pay_order($str);
 
@@ -116,50 +136,79 @@ class MatchPink extends AuthController
      * @return mixed
      */
     public function get_pink($id = 0){
-        $is_ok = 0;//判断拼团是否完成
-        $userBool = 0;//判断当前用户是否在团内  0未在 1在
-        $pinkBool = 0;//判断当前用户是否在团内  0未在 1在
-        if(!$id) return JsonService::fail('参数错误');
-        $pink = \app\ebapi\model\match\MatchPink::getPinkUserOne($id);
-        if(isset($pink['is_refund']) && $pink['is_refund']) {
-            if($pink['is_refund'] != $pink['id']){
-                $id = $pink['is_refund'];
-                return $this->get_pink($id);
-            }else{
-                return JsonService::fail('订单已退款');
-            }
-        }
-        if(!$pink) return JsonService::fail('参数错误');
-        list($pinkAll,$pinkT,$count,$idAll,$uidAll)=\app\ebapi\model\match\MatchPink::getPinkMemberAndPinkK($pink);
-        if($pinkT['status'] == 2){
-            $pinkBool = 1;
-            $is_ok = 1;
+        $match_pink = Db::name("match_pink")->where(["id"=>$id])->find();
+
+        if($match_pink["k_id"]==0){
+            $count = Db::name("match_pink")
+                ->alias("a")
+                ->join("user b","a.uid=b.uid")
+                ->field("a.uid,b.avatar")
+                ->where(["a.cid"=>$match_pink["cid"],"a.k_id"=>$match_pink["uid"]])
+                ->whereOr(["a.cid"=>$match_pink["cid"],"a.uid"=>$match_pink["uid"]])
+                ->count();
+
         }else{
-            if(!$count){//组团完成
-                $is_ok = 1;
-                $pinkBool=\app\ebapi\model\match\MatchPink::PinkComplete($uidAll,$idAll,$this->userInfo['uid'],$pinkT);
-            }else{
-                $pinkBool=\app\ebapi\model\match\MatchPink::PinkFail($pinkAll,$pinkT,$pinkBool);
-            }
+            $count = Db::name("match_pink")
+                ->alias("a")
+                ->join("user b","a.uid=b.uid")
+                ->field("a.uid,b.avatar")
+                ->where(["a.cid"=>$match_pink["cid"],"a.k_id"=>$match_pink["k_id"]])
+                ->whereOr(["a.cid"=>$match_pink["cid"],"a.uid"=>$match_pink["k_id"]])
+                ->count();
         }
-        if(!empty($pinkAll)){
-            foreach ($pinkAll as $v){
-                if($v['uid'] == $this->userInfo['uid']) $userBool = 1;
-            }
+
+
+        if($match_pink["stop_time"]<time() &&$match_pink["status"]==1){
+
+            Db::name("match_pink")
+                ->where(["cid"=>$match_pink["cid"],"k_id"=>$match_pink["k_id"]])
+                ->whereOr(["cid"=>$match_pink["cid"],"uid"=>$match_pink["k_id"]])
+                ->update(["status"=>3]);
+            $match_pink["status"] = 3 ;
+        }elseif($match_pink["stop_time"]>time() &&$match_pink["status"]==1){
+            Db::name("match_pink")
+                ->where(["cid"=>$match_pink["cid"],"k_id"=>$match_pink["k_id"]])
+                ->whereOr(["cid"=>$match_pink["cid"],"uid"=>$match_pink["k_id"]])
+                ->update(["status"=>2]);
+            $match_pink["status"] = 2 ;
         }
-        if($pinkT['uid'] == $this->userInfo['uid']) $userBool = 1;
-        $combinationOne = MatchCombination::getCombinationOne($pink['cid']);
-        if(!$combinationOne) return JsonService::fail('拼团不存在或已下架');
-        $data['userInfo'] = $this->userInfo;
-        $data['pinkBool'] = $pinkBool;
-        $data['is_ok'] = $is_ok;
-        $data['userBool'] = $userBool;
-        $data['store_combination'] =$combinationOne;
-        $data['pinkT'] = $pinkT;
-        $data['pinkAll'] = $pinkAll;
-        $data['count'] = $count;
-        $data['store_combination_host'] = MatchCombination::getCombinationHost();
-        $data['current_pink_order'] = \app\ebapi\model\match\MatchPink::getCurrentPink($id,$this->uid);
+
+
+        $match_combination = Db::name("match_combination")->where(["id"=>$match_pink["cid"]])->find();
+        $data["images"] = $match_combination["image"];
+        $data["title"] = $match_combination["title"];
+        $data["price"] = $match_pink["price"];
+        $data["people"] = $match_pink["people"];
+        $data["peo_ple"] = $match_pink["people"]-$count;
+        $data["stop_time"] = date("Y-m-d H:i:s",$match_combination["stop_time"]);
+        if($match_pink["status"]==1){
+            $data["status_name"] = "拼团中";
+        }elseif($match_pink["status"]==2){
+            $data["status_name"] = "拼团成功";
+        }elseif($match_pink["status"]==3){
+            $data["status_name"] = "拼团失败";
+        }
+        if($match_pink["k_id"]==0){
+
+            $data["users"] = Db::name("match_pink")
+                ->alias("a")
+                ->join("user b","a.uid=b.uid")
+                ->field("a.uid,b.avatar")
+                ->where(["a.cid"=>$match_pink["cid"],"a.k_id"=>$match_pink["uid"]])
+                ->whereOr(["a.cid"=>$match_pink["cid"],"a.uid"=>$match_pink["uid"]])
+                ->select();
+
+        }else{
+            $data["users"] = Db::name("match_pink")
+                ->alias("a")
+                ->join("user b","a.uid=b.uid")
+                ->field("a.uid,b.avatar")
+                ->where(["a.cid"=>$match_pink["cid"],"a.k_id"=>$match_pink["k_id"]])
+                ->whereOr(["a.cid"=>$match_pink["cid"],"a.uid"=>$match_pink["k_id"]])
+                ->select();
+
+        }
+
         return JsonService::successful('ok',$data);
     }
 
@@ -172,7 +221,7 @@ class MatchPink extends AuthController
         return JsonService::successful(\app\ebapi\model\match\MatchPink::getPinkSecondOne());
     }
 
-    /*
+    /**
      * 取消开团
      * @param int $pink_id 团长id
      * */
@@ -246,13 +295,22 @@ class MatchPink extends AuthController
         $data = input("post.");
 
        $match_pink=Db::name("match_pink")
-            ->field("id,cid,add_time,total_price")
+            ->field("id,cid,add_time,total_price,stop_time,status,k_id")
+            ->where(["uid"=>$this->uid])
             ->page($data["page"],$data["size"])
             ->select();
        foreach($match_pink as $k=>$v){
            $match_pink[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+           $match_pink[$k]["stop_time"] = date("Y-m-d H:i:s",$v["stop_time"]);
            $match_pink[$k]["images"] = Db::name("match_combination")->where(["product_id"=>$v["cid"]])->value("image");
            $match_pink[$k]["title"] = Db::name("match_combination")->where(["product_id"=>$v["cid"]])->value("title");
+           if($v["status"]==1){
+               $match_pink[$k]["status_name"] = "拼团中";
+           }elseif($v["status"]==2){
+               $match_pink[$k]["status_name"] = "拼团成功";
+           }elseif($v["status"]==3){
+               $match_pink[$k]["status_name"] = "拼团失败";
+           }
        }
 
         return JsonService::successful('ok',$match_pink);

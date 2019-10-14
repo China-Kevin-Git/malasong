@@ -227,7 +227,8 @@ class MatchPink extends ModelBasic
     public static function getCurrentPink($id,$uid){
         $pink = self::where('id',$id)->where('uid',$uid)->find();
         if(!$pink) $pink = self::where('k_id',$id)->where('uid',$uid)->find();
-        return StoreOrder::where('id',$pink['order_id_key'])->value('order_id');
+
+        return MatchOrder::where('order_id',$pink['order_id'])->value('order_id');
     }
 
     public static function systemPage($where){
@@ -286,7 +287,7 @@ class MatchPink extends ModelBasic
      */
     public static function setRefundPink($oid){
         $res = true;
-        $order = StoreOrder::where('id',$oid)->find();
+        $order = MatchOrder::where('id',$oid)->find();
         if($order['pink_id']) $id = $order['pink_id'];
         else return $res;
         $count = self::where('id',$id)->where('uid',$order['uid'])->find();//正在拼团 团长
@@ -333,13 +334,13 @@ class MatchPink extends ModelBasic
      * @return mixed
      */
     public static function createPink($order){
-        $order = StoreOrder::tidyOrder($order,true)->toArray();
+        $order = MatchOrder::tidyOrder($order,true)->toArray();
         if($order['pink_id']){//拼团存在
             $res = false;
             $pink['uid'] = $order['uid'];//用户id
             if(self::isPinkBe($pink,$order['pink_id'])) return false;
             $pink['order_id'] = $order['order_id'];//订单id  生成
-            $pink['order_id_key'] = $order['id'];//订单id  数据库id
+            $pink['order_id'] = $order['id'];//订单id  数据库id
             $pink['total_num'] = $order['total_num'];//购买个数
             $pink['total_price'] = $order['pay_price'];//总金额
             $pink['k_id'] = $order['pink_id'];//拼团id
@@ -372,7 +373,7 @@ class MatchPink extends ModelBasic
             $res = false;
             $pink['uid'] = $order['uid'];//用户id
             $pink['order_id'] = $order['order_id'];//订单id  生成
-            $pink['order_id_key'] = $order['id'];//订单id  数据库id
+            $pink['order_id'] = $order['id'];//订单id  数据库id
             $pink['total_num'] = $order['total_num'];//购买个数
             $pink['total_price'] = $order['pay_price'];//总金额
             $pink['k_id'] = 0;//拼团id
@@ -386,7 +387,7 @@ class MatchPink extends ModelBasic
                 $pink['stop_time'] = time()+86400;//结束时间
                 $pink['add_time'] = time();//开团时间
                 $res1 = self::set($pink)->toArray();
-                $res2 = StoreOrder::where('id',$order['id'])->update(['pink_id'=>$res1['id']]);
+                $res2 = MatchOrder::where('id',$order['id'])->update(['pink_id'=>$res1['id']]);
                 $res = $res1 && $res2;
             }
             RoutineTemplate::sendOut('OPEN_PINK_SUCCESS',$order['uid'],[
@@ -472,21 +473,22 @@ class MatchPink extends ModelBasic
             if($pinkT['stop_time'] < time()){//拼团时间超时  退款
                 //团员退款
                 foreach ($pinkAll as $v){
-                    if(StoreOrder::orderApplyRefund(StoreOrder::getPinkOrderId($v['order_id_key']),$v['uid'],'拼团时间超时') && self::isTpl($v['uid'],$pinkT['id'])){
+                    if(MatchOrder::orderApplyRefund(MatchOrder::getPinkOrderId($v['order_id']),$v['uid'],'拼团时间超时') && self::isTpl($v['uid'],$pinkT['id'])){
+
                         self::orderPinkAfterNo($v['uid'],$v['k_id']);
                         if($isIds) array_push($pinkIds,$v['id']);
                         $pinkBool = 2;
                     }else{
-                        if($isRunErr) return self::setErrorInfo(StoreOrder::getErrorInfo(),true);
+                        if($isRunErr) return self::setErrorInfo(MatchOrder::getErrorInfo(),true);
                     }
                 }
                 //团长退款
-                if(StoreOrder::orderApplyRefund(StoreOrder::getPinkOrderId($pinkT['order_id_key']),$pinkT['uid'],'拼团时间超时') && self::isTpl($pinkT['uid'],$pinkT['id'])){
+                if(MatchOrder::orderApplyRefund(MatchOrder::getPinkOrderId($pinkT['order_id']),$pinkT['uid'],'拼团时间超时') && self::isTpl($pinkT['uid'],$pinkT['id'])){
                     self::orderPinkAfterNo($pinkT['uid'],$pinkT['id']);
                     if($isIds) array_push($pinkIds,$pinkT['id']);
                     $pinkBool = 2;
                 }else{
-                    if($isRunErr) return self::setErrorInfo(StoreOrder::getErrorInfo(),true);
+                    if($isRunErr) return self::setErrorInfo(MatchOrder::getErrorInfo(),true);
                 }
                 if(!$pinkBool) $pinkBool = 3;
             }
@@ -550,15 +552,15 @@ class MatchPink extends ModelBasic
                 }
             }
             //取消开团
-            if(StoreOrder::orderApplyRefund(StoreOrder::getPinkOrderId($pinkT['order_id_key']),$pinkT['uid'],'拼团取消开团') && self::isTpl($pinkT['uid'],$pinkT['id']))
+            if(MatchOrder::orderApplyRefund(MatchOrder::getPinkOrderId($pinkT['order_id']),$pinkT['uid'],'拼团取消开团') && self::isTpl($pinkT['uid'],$pinkT['id']))
                 self::orderPinkAfterNo($pinkT['uid'],$pinkT['id'],$formId,'拼团取消开团',true);
             else
-                return self::setErrorInfo(['status'=>200,'msg'=>StoreOrder::getErrorInfo()],true);
+                return self::setErrorInfo(['status'=>200,'msg'=>MatchOrder::getErrorInfo()],true);
             //当前团有人的时候
             if(is_array($nextPinkT)){
                 self::where('id',$nextPinkT['id'])->update(['k_id'=>0,'status'=>1,'stop_time'=>$pinkT['stop_time']]);
                 self::where('k_id',$pinkT['id'])->update(['k_id'=>$nextPinkT['id']]);
-                StoreOrder::where('order_id',$nextPinkT['order_id'])->update(['pink_id'=>$nextPinkT['id']]);
+                MatchOrder::where('order_id',$nextPinkT['order_id'])->update(['pink_id'=>$nextPinkT['id']]);
             }
             self::commitTrans();
             return true;
