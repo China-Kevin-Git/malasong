@@ -63,6 +63,7 @@ class MatchBargains extends AuthController
         $bargain['time'] = time();
         $data['userInfo'] = $this->userInfo;
         $data['bargain'] = $bargain;
+        $data['bargainSumCount']=0;
         return JsonService::successful($data);
     }
 
