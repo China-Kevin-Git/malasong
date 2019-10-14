@@ -264,8 +264,6 @@ class MatchBargains extends AuthController
                 $res = RoutineCode::getPageCode('pages/activity/goods_bargain_details/index',$valueData,280);
                 if(!$res) return JsonService::fail('二维码生成失败');
                 $imageInfo = UploadService::imageStream($name,$res,'routine/activity/bargain/code');
-                dump($imageInfo);exit;
-
                 if(!is_array($imageInfo)) return JsonService::fail($imageInfo);
                 if($imageInfo['image_type'] == 1) $remoteImage = UtilService::remoteImage($siteUrl.$imageInfo['dir']);
                 else $remoteImage = UtilService::remoteImage($imageInfo['dir']);
