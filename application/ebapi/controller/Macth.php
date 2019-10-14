@@ -407,6 +407,9 @@ class Macth extends AuthController
             }elseif($v['is_pay']==1 && $v['status']==3){
                 $match_order[$k]['status_name']="报名成功";
                 $match_order[$k]['is_static']=3;
+            }elseif($v['is_pay']==3){
+                $match_order[$k]['status_name']="已取消";
+                $match_order[$k]['is_static']=4;
             }
         }
 
@@ -498,5 +501,17 @@ class Macth extends AuthController
 
         return self::asJson($comment);
     }
+
+    /**
+     * 赛事取消
+     */
+    public function cancel()
+    {
+        $data = input("post.");
+
+        Db::name("match_order")->where(["match_order_sn"=>$data["match_order_sn"]])->update(["is_pay"=>3]);
+        return self::asJson();
+    }
+
 
 }
