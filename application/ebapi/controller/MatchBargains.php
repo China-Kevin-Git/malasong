@@ -292,24 +292,24 @@ class MatchBargains extends AuthController
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         $match=MatchBargainUser::setBargainUserStatus($data["bargainId"], $this->userInfo['uid']); //修改砍价状态StoreBargainUser::setBargainUserStatus($bargainId, $this->userInfo['uid']); //修改砍价状态
         if($match ===false){
-            JsonService::fail('拼团未成功，请重试');
+            JsonService::fail('砍价未成功，请重试');
         }
 
-        $seckill = Db::name("match_bargain")->field("id,product_id,image,title,price,stop_time")->where(["id"=>$data["bargainId"]])->find();
-
+        $seckill = Db::name("match_bargain")->field("id,product_id,image,title,price,stop_time,min_price")->where(["id"=>$data["bargainId"]])->find();
+        $price = MatchBargainUser::getBargainUserDiffPriceFloat($data["bargainId"]);
         $add=[
             "uid"=>$this->uid,
             "match_id"=>$seckill["product_id"],
-            "order_price"=>0,
+            "order_price"=>$seckill["min_price"],
             "match_order_sn"=>$str,
             "add_time"=>time(),
             "match_name"=>$seckill["title"],
             "type"=>2,
-            "is_pay"=>1,
             "pay_time"=>time(),
             "status"=>1,
         ];
         Db::name("match_order")->insert($add);
-        return JsonService::successful('ok');
+        $pay = new AuthApi();
+        $pay->pay_order($str);
     }
 }
