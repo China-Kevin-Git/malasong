@@ -300,7 +300,7 @@ class MatchBargains extends AuthController
         $add=[
             "uid"=>$this->uid,
             "match_id"=>$seckill["product_id"],
-            "order_price"=>$seckill["min_price"],
+            "order_price"=>$price,
             "match_order_sn"=>$str,
             "add_time"=>time(),
             "match_name"=>$seckill["title"],
