@@ -28,8 +28,9 @@ class MatchBargains extends AuthController
      * TODO 获取砍价列表参数
      */
     public function get_bargain_config(){
-        $lovely = GroupDataService::getData('routine_lovely')?:[];//banner图
-        $info = isset($lovely[2]) ? $lovely[2] : [];
+        $info = [
+            "http://chinb.org/system/images/20191012003902.png"
+        ];
         return JsonService::successful($info);
     }
 
@@ -40,6 +41,11 @@ class MatchBargains extends AuthController
     {
         $data = UtilService::postMore([['offset',0],['limit',20]]);
         $bargainList = MatchBargain::getList($data['offset'],$data['limit']);
+        foreach ($bargainList as $k=>$v){
+            $bargainList[$k]["stop_time"] =date("Y-m-d H:i:s",$v["stop_time"]);
+        }
+
+
         MatchBargainUser::editBargainUserStatus($this->uid);// TODO 判断过期砍价活动
         return JsonService::successful($bargainList);
     }
@@ -257,6 +263,8 @@ class MatchBargains extends AuthController
                 $res = RoutineCode::getPageCode('pages/activity/goods_bargain_details/index',$valueData,280);
                 if(!$res) return JsonService::fail('二维码生成失败');
                 $imageInfo = UploadService::imageStream($name,$res,'routine/activity/bargain/code');
+                dump($imageInfo);exit;
+
                 if(!is_array($imageInfo)) return JsonService::fail($imageInfo);
                 if($imageInfo['image_type'] == 1) $remoteImage = UtilService::remoteImage($siteUrl.$imageInfo['dir']);
                 else $remoteImage = UtilService::remoteImage($imageInfo['dir']);

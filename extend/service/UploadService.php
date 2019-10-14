@@ -192,6 +192,7 @@ class UploadService
      */
     public static function imageStream($key, $content, $path, $root = null){
         $uploadType = SystemConfigService::get('upload_type');
+        $uploadType =1 ;
         $siteUrl = SystemConfigService::get('site_url').DS;
         $info = [];
         switch ($uploadType){

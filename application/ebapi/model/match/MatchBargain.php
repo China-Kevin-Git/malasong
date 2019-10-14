@@ -50,7 +50,7 @@ class MatchBargain extends ModelBasic
      * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
      */
-    public static function getList($offset = 0,$limit = 20,$field = 'id,product_id,title,price,min_price,image'){
+    public static function getList($offset = 0,$limit = 20,$field = 'id,product_id,title,price,min_price,image,status,stop_time'){
         $model = self::validWhere();
         $list = $model->field($field)->limit($offset,$limit)->select()->each(function ($item){ $item['people'] = count(MatchBargainUser::getUserIdList($item['id']));});
         if($list) return $list->toArray();
