@@ -388,7 +388,7 @@ class Macth extends AuthController
         }
 
         $match_order = Db::name("match_order")
-            ->field("match_id,order_price,is_pay,status,add_time,match_name")
+            ->field("match_id,order_price,is_pay,status,add_time,match_name,match_order_sn")
             ->where("uid",'=',$this->uid)
             ->where($where)
             ->order("add_time desc")
