@@ -383,16 +383,12 @@ class StoreOrder extends ModelBasic
             $orderInfo['order_id']=$orderId["match_order_sn"];
             $orderInfo['pay_price']=$orderId["order_price"];
             $orderInfo['uid']=$orderId["uid"];
-        }elseif(strpos($orderId["order_id"],'pink-') !==false){
-            $orderInfo['order_id']=$orderId["order_id"];
-            $orderInfo['pay_price']=$orderId["total_price"];
-            $orderInfo['uid']=$orderId["uid"];
-
         }else{
-            if(is_string($orderId))
+            if(is_string($orderId)){
                 $orderInfo = self::where($field,$orderId)->find();
-            else
+            }else{
                 $orderInfo = $orderId;
+            }
             if(!$orderInfo || !isset($orderInfo['paid'])) exception('支付订单不存在!');
             if($orderInfo['paid']) exception('支付已支付!');
             if($orderInfo['pay_price'] <= 0) exception('该支付无需支付!');
