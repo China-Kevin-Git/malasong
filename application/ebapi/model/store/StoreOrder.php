@@ -383,6 +383,10 @@ class StoreOrder extends ModelBasic
             $orderInfo['order_id']=$orderId["match_order_sn"];
             $orderInfo['pay_price']=$orderId["order_price"];
             $orderInfo['uid']=$orderId["uid"];
+        }elseif(strpos($orderId,'pink-')!==false){
+            $orderInfo=$orderId;
+            $orderInfo['pay_price']=$orderId["total_price"];
+            $orderInfo['uid']=$orderId["uid"];
         }else{
             if(is_string($orderId)){
                 $orderInfo = self::where($field,$orderId)->find();
