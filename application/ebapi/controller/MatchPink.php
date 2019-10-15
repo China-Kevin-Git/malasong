@@ -77,7 +77,7 @@ class MatchPink extends AuthController
             $match_pink["userPink"][$k]["nickname"] = $user["nickname"];
             $match_pink["userPink"][$k]["avatar"] = $user["avatar"];
             $count = Db::name("store_pink")->where(["cid"=>$data["id"],"k_id"=>$v["uid"]])->page($data["page"],$data["size"])->count();
-            $match_pink["userPink"][$k]["num"] = $user["people"]-$count;
+            $match_pink["userPink"][$k]["num"] = $v["people"]-$count;
         }
 
         $match_pink["pinkNum"] = Db::name("store_pink")->where(["cid"=>$data["id"],"k_id"=>0])->count();
