@@ -27,13 +27,11 @@
                         <tr>
 
                             <th>编号</th>
-
                             <th>分类昵称</th>
-
                             <th>赛事结束时间</th>
                             <th>报名截止时间</th>
                             <th>地址</th>
-
+                            <th>开启活动</th>
                             <th>操作</th>
 
                         </tr>
@@ -66,16 +64,22 @@
                                 {$vo.address}
 
                             </td>
-
+                            <td class="text-center">
+                                <a class="btn  btn-xs" href="javascript:void(0);" onclick="$eb.createModalFrame(this.innerText,'{:Url('umps.match_seckill/seckill')}?id={$vo['id']}')"">
+                                <i class="fa fa-gavel"></i> 开启秒杀</a>
+                                <a class="btn  btn-xs" href="javascript:void(0);" onclick="$eb.createModalFrame(this.innerText,'{:Url('umps.match_bargain/bargain')}?id={$vo['id']}')">
+                                    <i class="fa fa-sort-amount-asc"></i> 开启砍价</a>
+                                <a class="btn  btn-xs" href="javascript:void(0);" onclick="$eb.createModalFrame(this.innerText,'{:Url('umps.match_combination/combination')}?id={$vo['id']}')">
+                                    <i class="fa fa-hand-lizard-o"></i> 开启拼团</a>
+                            </td>
                             <td class="text-center">
 
                                 <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('编辑','{:Url('edit',array('id'=>$vo['id']))}')"><i class="fa fa-paste"></i> 编辑</button>
-
                                 <button class="btn btn-warning btn-xs del_config_tab" data-id="{$vo.id}" type="button" data-url="{:Url('delete',array('id'=>$vo['id']))}" ><i class="fa fa-warning"></i> 删除</button>
                                 <a type="button" class="btn btn-info btn-xs"  onclick="$eb.createModalFrame(this.innerText,'{:Url('edit_content')}?id={$vo['id']}')"> <i class="fa fa-paste"></i> 详情</a>
 
-
                             </td>
+
 
                         </tr>
 
@@ -149,6 +153,38 @@
                 $eb.createModalFrame(this.innerText,"{:Url('SystemConfig/create')}?type="+result);
             }
         })
-    })
+    });
+
+    $(document).click(function (e) {
+        $('.layui-nav-child').hide();
+    });
+    function dropdown(that){
+        var oEvent = arguments.callee.caller.arguments[0] || event;
+        oEvent.stopPropagation();
+        var offset = $(that).offset();
+        var top=offset.top-$(window).scrollTop();
+        var index = $(that).parents('tr').data('index');
+        $('.layui-nav-child').each(function (key) {
+            if (key != index) {
+                $(this).hide();
+            }
+        })
+        if($(document).height() < top+$(that).next('ul').height()){
+            $(that).next('ul').css({
+                'padding': 10,
+                'top': - ($(that).parent('td').height() / 2 + $(that).height() + $(that).next('ul').height()/2),
+                'min-width': 'inherit',
+                'position': 'absolute',
+            }).toggle();
+        }else{
+            $(that).next('ul').css({
+                'padding': 10,
+                'top':$(that).parent('td').height() / 2 + $(that).height(),
+                'min-width': 'inherit',
+                'position': 'absolute',
+
+            }).toggle();
+        }
+    }
 </script>
 {/block}

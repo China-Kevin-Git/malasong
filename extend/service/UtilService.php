@@ -450,6 +450,7 @@ class UtilService
                 $val = array_merge($imageDefault,$val);
                 $info = getimagesize($val['url']);
                 $function = 'imagecreatefrom'.image_type_to_extension($info[2], false);
+
                 if($val['stream']){
                     $info = getimagesizefromstring($val['url']);
                     $function = 'imagecreatefromstring';
