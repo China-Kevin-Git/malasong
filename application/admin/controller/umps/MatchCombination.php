@@ -56,7 +56,7 @@ class MatchCombination extends AuthController
             ['export',0],
             ['is_show',''],
             ['is_host',''],
-            ['Match_name','']
+            ['match_name','']
         ],$request);
         $combinationList = MatchCombinationModel::systemPage($where);
         if(is_object($combinationList['list'])) $combinationList['list'] = $combinationList['list']->toArray();
@@ -100,20 +100,10 @@ class MatchCombination extends AuthController
             return $menus;
         })->filterable(1);
         $f[] = Form::input('title','拼团名称');
-        $f[] = Form::input('info','拼团简介')->type('textarea');
-        $f[] = Form::input('unit_name','单位')->placeholder('个、位');
         $f[] = Form::dateTimeRange('section_time','拼团时间');
         $f[] = Form::frameImageOne('image','产品主图片(305*305px)',Url::build('admin/widget.images/index',array('fodder'=>'image')))->icon('image');
-        $f[] = Form::frameImages('images','产品轮播图(640*640px)',Url::build('admin/widget.images/index',array('fodder'=>'images')))->maxLength(5)->icon('images');
         $f[] = Form::number('price','拼团价')->min(0)->col(12);
         $f[] = Form::number('people','拼团人数')->min(3)->col(12);
-        $f[] = Form::number('stock','库存')->min(0)->precision(0)->col(12);
-        $f[] = Form::number('sales','销量')->min(0)->precision(0)->col(12);
-        $f[] = Form::number('sort','排序')->col(12);
-        $f[] = Form::number('postage','邮费')->min(0)->col(12);
-        $f[] = Form::radio('is_postage','是否包邮',1)->options([['label'=>'是','value'=>1],['label'=>'否','value'=>0]])->col(12);
-        $f[] = Form::radio('is_host','热门推荐',1)->options([['label'=>'开启','value'=>1],['label'=>'关闭','value'=>0]])->col(12);
-        $f[] = Form::radio('is_show','活动状态',1)->options([['label'=>'开启','value'=>1],['label'=>'关闭','value'=>0]])->col(12);
         $form = Form::make_post_form('添加用户通知',$f,Url::build('save'));
         $this->assign(compact('form'));
         return $this->fetch('public/form-builder');
@@ -177,20 +167,11 @@ class MatchCombination extends AuthController
         $f = array();
         $f[] = Form::hidden('product_id',$product->getData('product_id'));
         $f[] = Form::input('title','拼团名称',$product->getData('title'));
-        $f[] = Form::input('info','拼团简介',$product->getData('info'))->type('textarea');
-        $f[] = Form::input('unit_name','单位',$product->getData('unit_name'))->placeholder('个、位');
         $f[] = Form::dateTimeRange('section_time','拼团时间',$product->getData('start_time'),$product->getData('stop_time'));
         $f[] = Form::frameImageOne('image','产品主图片(305*305px)',Url::build('admin/widget.images/index',array('fodder'=>'image')),$product->getData('image'))->icon('image');
-        $f[] = Form::frameImages('images','产品轮播图(640*640px)',Url::build('admin/widget.images/index',array('fodder'=>'images')),json_decode($product->getData('images')))->maxLength(5)->icon('images');
         $f[] = Form::number('price','拼团价',$product->getData('price'))->min(0)->col(12);
+        $f[] = Form::number('match_price','原价',$product->getData('match_price'))->min(0)->col(12);
         $f[] = Form::number('people','拼团人数',$product->getData('people'))->min(2)->col(12);
-        $f[] = Form::number('stock','库存',$product->getData('stock'))->min(0)->precision(0)->col(12);
-        $f[] = Form::number('sales','销量',$product->getData('sales'))->min(0)->precision(0)->col(12);
-        $f[] = Form::number('sort','排序',$product->getData('sort'))->col(12);
-        $f[] = Form::number('postage','邮费',$product->getData('postage'))->min(0)->col(12);
-        $f[] = Form::radio('is_postage','是否包邮',$product->getData('is_postage'))->options([['label'=>'是','value'=>1],['label'=>'否','value'=>0]])->col(12);
-        $f[] = Form::radio('is_host','热门推荐',$product->getData('is_host'))->options([['label'=>'开启','value'=>1],['label'=>'关闭','value'=>0]])->col(12);
-        $f[] = Form::radio('is_show','活动状态',$product->getData('is_show'))->options([['label'=>'开启','value'=>1],['label'=>'关闭','value'=>0]])->col(12);
         $form = Form::make_post_form('添加用户通知',$f,Url::build('save',compact('id')));
         $this->assign(compact('form'));
         return $this->fetch('public/form-builder');
@@ -340,7 +321,6 @@ class MatchCombination extends AuthController
         ],$this->request);
         $this->assign('where',$where);
         $this->assign(MatchPink::systemPage($where));
-
         return $this->fetch();
     }
     /**拼团人列表

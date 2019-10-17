@@ -9,6 +9,7 @@
 namespace app\admin\controller\umps;
 
 use app\admin\controller\AuthController;
+use app\admin\model\match\macth;
 use app\admin\model\Match\MatchProduct;
 use service\JsonService;
 use service\UtilService as Util;
@@ -39,7 +40,7 @@ class MatchBargain extends AuthController
     {
         $where = Util::getMore([
             ['status',''],
-            ['Match_name',''],
+            ['match_name',''],
             ['export',0],
             ['data',''],
         ],$this->request);
@@ -74,7 +75,7 @@ class MatchBargain extends AuthController
             ['page',1],
             ['limit',20],
             ['export',0],
-            ['Match_name',''],
+            ['match_name',''],
             ['status',''],
             ['data','']
         ]);
@@ -149,27 +150,14 @@ class MatchBargain extends AuthController
         $f = array();
         $f[] = Form::input('title','砍价活动名称',$product->getData('title'));
         $f[] = Form::hidden('product_id',$product->getData('product_id'));
-        $f[] = Form::input('info','砍价活动简介',$product->getData('info'))->type('textarea');
-        $f[] = Form::input('Match_name','砍价产品名称',$product->getData('Match_name'));
-        $f[] = Form::input('unit_name','单位',$product->getData('unit_name'))->placeholder('个、位');
+        $f[] = Form::input('match_name','砍价产品名称',$product->getData('store_name'));
         $f[] = Form::dateTimeRange('section_time','活动时间',$product->getData('start_time'),$product->getData('stop_time'));//->format("yyyy-MM-dd HH:mm:ss");
         $f[] = Form::frameImageOne('image','产品主图片(305*305px)',Url::build('admin/widget.images/index',array('fodder'=>'image')),$product->getData('image'))->icon('image');
-        $f[] = Form::frameImages('images','产品轮播图(640*640px)',Url::build('admin/widget.images/index',array('fodder'=>'images')),json_decode($product->getData('images'),1))->maxLength(5)->icon('images');
         $f[] = Form::number('price','显示原价',$product->getData('price'))->min(0)->col(12);
         $f[] = Form::number('min_price','最低购买价',$product->getData('min_price'))->min(0)->col(12);
         $f[] = Form::number('bargain_max_price','单次砍价的最大金额',$product->getData('bargain_max_price'))->min(0)->col(12);
         $f[] = Form::number('bargain_min_price','单次砍价的最小金额',$product->getData('bargain_min_price'))->min(0)->col(12);
-        $f[] = Form::number('cost','成本价',$product->getData('cost'))->min(0)->col(12);
         $f[] = Form::number('bargain_num','单次砍价的次数',$product->getData('bargain_num'))->min(0)->col(12);
-        $f[] = Form::number('stock','库存',$product->getData('stock'))->min(0)->col(12);
-        $f[] = Form::number('sales','销量',$product->getData('sales'))->min(0)->col(12);
-        $f[] = Form::number('sort','排序',$product->getData('sort'))->col(12);
-        $f[] = Form::number('num','单次允许购买数量',$product->getData('num'))->col(12);
-        $f[] = Form::number('give_integral','赠送积分',$product->getData('give_integral'))->min(0)->col(12);
-        $f[] = Form::number('postage','邮费',$product->getData('postage'))->min(0)->col(12);
-        $f[] = Form::radio('is_postage','是否包邮',$product->getData('is_postage'))->options([['label'=>'是','value'=>1],['label'=>'否','value'=>0]])->col(12);
-        $f[] = Form::radio('is_hot','热门推荐',$product->getData('is_hot'))->options([['label'=>'开启','value'=>1],['label'=>'关闭','value'=>0]])->col(12);
-        $f[] = Form::radio('status','活动状态',$product->getData('status'))->options([['label'=>'开启','value'=>1],['label'=>'关闭','value'=>0]])->col(12);
         $form = Form::make_post_form('添加用户通知',$f,Url::build('update',array('id'=>$id)));
         $this->assign(compact('form'));
         return $this->fetch('public/form-builder');
@@ -243,7 +231,7 @@ class MatchBargain extends AuthController
         $product = MatchBargainModel::get($id);
         if(!$product) return Json::fail('数据不存在!');
         $data['is_del'] = 1;
-        if(MatchBargainModel::edit($data,$id) && MatchProduct::edit(['is_bargain'=>0],$product['product_id']))
+        if(MatchBargainModel::edit($data,$id))
             return Json::successful('删除成功!');
         else
             return Json::fail(MatchBargainModel::getErrorInfo('删除失败,请稍候再试!'));

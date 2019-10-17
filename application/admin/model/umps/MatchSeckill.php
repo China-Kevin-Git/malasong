@@ -7,17 +7,16 @@
 
 namespace app\admin\model\umps;
 
-use app\admin\model\order\StoreOrder;
-use app\admin\model\store\StoreProductRelation;
+use app\admin\model\order\MtachOrder;
+use app\admin\model\match\macth;
 use app\admin\model\system\SystemConfig;
 use traits\ModelTrait;
 use basic\ModelBasic;
-use app\admin\model\store\StoreProduct;
 use service\PHPExcelService;
 
 /**
- * Class StoreSeckill
- * @package app\admin\model\store
+ * Class MtachSeckill
+ * @package app\admin\model\Mtach
  */
 class MatchSeckill extends ModelBasic
 {
@@ -66,8 +65,8 @@ class MatchSeckill extends ModelBasic
             ->distinct(true)
             ->select()
             ->each(function($item) use($data){
-                $item['collect']=self::getModelTime(compact('data'),new StoreProductRelation)->where(['type'=>'collect'])->count();
-                $item['like']=self::getModelTime(compact('data'),new StoreProductRelation())->where(['type'=>'like'])->count();
+                $item['collect']=self::getModelTime(compact('data'),new MtachProductRelation)->where(['type'=>'collect'])->count();
+                $item['like']=self::getModelTime(compact('data'),new MtachProductRelation())->where(['type'=>'like'])->count();
             })->toArray();
         $chatrList=[];
         $datetime=[];
@@ -101,7 +100,7 @@ class MatchSeckill extends ModelBasic
      * @return array
      */
     public static function getbadge($where,$type){
-        $StoreOrderModel = new StoreOrder();
+        $MtachOrderModel = new MtachOrder();
         $replenishment_num = SystemConfig::getValue('replenishment_num');
         $replenishment_num = $replenishment_num > 0 ? $replenishment_num : 20;
         $stock1 = self::getModelTime($where,new self())->where('stock','<',$replenishment_num)->column('stock');
@@ -137,10 +136,10 @@ class MatchSeckill extends ModelBasic
             [
                 'name'=>'活动商品',
                 'field'=>'件',
-                'count'=>self::getModelTime($where,$StoreOrderModel)->where('seckill_id','NEQ',0)->sum('total_num'),
+                'count'=>self::getModelTime($where,$MtachOrderModel)->where('seckill_id','NEQ',0)->sum('total_num'),
                 'content'=>'活动商品总数',
                 'background_color'=>'layui-bg-green',
-                'sum'=>$StoreOrderModel->sum('total_num'),
+                'sum'=>$MtachOrderModel->sum('total_num'),
                 'class'=>'fa fa-bar-chart',
             ],
             [
@@ -161,9 +160,9 @@ class MatchSeckill extends ModelBasic
      */
     public static function getMaxList($where){
         $classs=['layui-bg-red','layui-bg-orange','layui-bg-green','layui-bg-blue','layui-bg-cyan'];
-        $model=StoreOrder::alias('a')->join('__STORE_SECKILL__ b','b.id=a.seckill_id')->where('a.paid',1);
+        $model=MtachOrder::alias('a')->join('__Mtach_SECKILL__ b','b.id=a.seckill_id')->where('a.paid',1);
         $list=self::getModelTime($where,$model,'a.add_time')->group('a.seckill_id')->order('p_count desc')->limit(10)
-            ->field(['count(a.seckill_id) as p_count','b.title as store_name','sum(b.price) as sum_price'])->select();
+            ->field(['count(a.seckill_id) as p_count','b.title as Mtach_name','sum(b.price) as sum_price'])->select();
         if(count($list)) $list=$list->toArray();
         $maxList=[];
         $sum_count=0;
@@ -176,7 +175,7 @@ class MatchSeckill extends ModelBasic
         foreach ($list as $key=>&$item){
             $item['w']=bcdiv($item['p_count'],$sum_count,2)*100;
             $item['class']=isset($classs[$key]) ?$classs[$key]:( isset($classs[$key-count($classs)]) ? $classs[$key-count($classs)]:'');
-            $item['store_name']=self::getSubstrUTf8($item['store_name']);
+            $item['Mtach_name']=self::getSubstrUTf8($item['Mtach_name']);
         }
         $maxList['sum_count']=$sum_count;
         $maxList['sum_price']=$sum_price;
@@ -191,9 +190,9 @@ class MatchSeckill extends ModelBasic
      */
     public static function ProfityTop10($where){
         $classs=['layui-bg-red','layui-bg-orange','layui-bg-green','layui-bg-blue','layui-bg-cyan'];
-        $model = StoreOrder::alias('a')->join('__STORE_SECKILL__ b','b.id = a.seckill_id')->where('a.paid',1);
+        $model = MtachOrder::alias('a')->join('__Mtach_SECKILL__ b','b.id = a.seckill_id')->where('a.paid',1);
         $list=self::getModelTime($where,$model,'a.add_time')->group('a.seckill_id')->order('profity desc')->limit(10)
-            ->field(['count(a.seckill_id) as p_count','b.title as store_name','sum(b.price) as sum_price','(b.price-b.cost) as profity'])
+            ->field(['count(a.seckill_id) as p_count','b.title as Mtach_name','sum(b.price) as sum_price','(b.price-b.cost) as profity'])
             ->select();
         if(count($list)) $list=$list->toArray();
         $maxList=[];
@@ -206,7 +205,7 @@ class MatchSeckill extends ModelBasic
         foreach ($list as $key=>&$item){
             $item['w']=bcdiv($item['sum_price'],$sum_price,2)*100;
             $item['class']=isset($classs[$key]) ?$classs[$key]:( isset($classs[$key-count($classs)]) ? $classs[$key-count($classs)]:'');
-            $item['store_name']=self::getSubstrUTf8($item['store_name'],30);
+            $item['Mtach_name']=self::getSubstrUTf8($item['Mtach_name'],30);
         }
         $maxList['sum_count']=$sum_count;
         $maxList['sum_price']=$sum_price;
@@ -222,7 +221,7 @@ class MatchSeckill extends ModelBasic
     public static function getLackList($where){
         $replenishment_num = SystemConfig::getValue('replenishment_num');
         $replenishment_num = $replenishment_num > 0 ? $replenishment_num : 20;
-        $list=self::where('stock','<',$replenishment_num)->field(['id','title as store_name','stock','price'])->page((int)$where['page'],(int)$where['limit'])->order('stock asc')->select();
+        $list=self::where('stock','<',$replenishment_num)->field(['id','title as Mtach_name','stock','price'])->page((int)$where['page'],(int)$where['limit'])->order('stock asc')->select();
         if(count($list)) $list=$list->toArray();
         $count=self::where('stock','<',$replenishment_num)->count();
         return ['count'=>$count,'data'=>$list];
@@ -244,9 +243,9 @@ class MatchSeckill extends ModelBasic
      * @return mixed
      */
     public static function getBargainRefundList($where = array()){
-        $model = StoreOrder::alias('a')->join('__STORE_SECKILL__ b','b.id=a.seckill_id');
+        $model = MtachOrder::alias('a')->join('__Mtach_SECKILL__ b','b.id=a.seckill_id');
         $list = self::getModelTime($where,$model,'a.add_time')->where('a.refund_status','NEQ',0)->group('a.seckill_id')->order('count desc')->page((int)$where['page'],(int)$where['limit'])
-            ->field(['count(a.seckill_id) as count','b.title as store_name','sum(b.price) as sum_price'])->select();
+            ->field(['count(a.seckill_id) as count','b.title as Mtach_name','sum(b.price) as sum_price'])->select();
         if(count($list)) $list=$list->toArray();
         return $list;
     }
@@ -258,14 +257,13 @@ class MatchSeckill extends ModelBasic
     public static function systemPage($where){
         $model = new self;
         $model = $model->alias('s');
-//        $model = $model->join('StoreProduct p','p.id=s.product_id');
         if($where['status'] != '')  $model = $model->where('s.status',$where['status']);
-        if($where['store_name'] != '') $model = $model->where('s.title|s.id','LIKE',"%$where[store_name]%");
+        if($where['match_name'] != '') $model = $model->where('s.title|s.id','LIKE',"%$where[match_name]%");
         $model = $model->page(bcmul($where['page'],$where['limit'],0),$where['limit']);
         $model = $model->order('s.id desc');
         $model = $model->where('s.is_del',0);
         return self::page($model,function($item){
-            $item['store_name'] = StoreProduct::where('id',$item['product_id'])->value('store_name');
+            $item['match_name'] = macth::where('id',$item['product_id'])->value('match_name');
             if($item['status']){
                 if($item['start_time'] > time())
                     $item['start_name'] = '活动未开始';
@@ -280,12 +278,12 @@ class MatchSeckill extends ModelBasic
     public static function SaveExcel($where){
         $model = new self;
         if($where['status'] != '')  $model = $model->where('status',$where['status']);
-        if($where['store_name'] != '') $model = $model->where('title|id','LIKE',"%$where[store_name]%");
+        if($where['Mtach_name'] != '') $model = $model->where('title|id','LIKE',"%$where[Mtach_name]%");
         $list = $model->order('id desc')->where('is_del',0)->select();
         count($list) && $list=$list->toArray();
         $excel=[];
         foreach ($list as $item){
-            $item['store_name'] = StoreProduct::where('id',$item['product_id'])->value('store_name');
+            $item['Mtach_name'] = MtachProduct::where('id',$item['product_id'])->value('Mtach_name');
             if($item['status']){
                 if($item['start_time'] > time())
                     $item['start_name'] = '活动未开始';

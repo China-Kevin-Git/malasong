@@ -11,7 +11,7 @@ namespace app\admin\model\umps;
 use think\Db;
 use traits\ModelTrait;
 use basic\ModelBasic;
-use app\admin\model\store\StoreProductRelation;
+use app\admin\model\Match\macth;
 use app\admin\model\order\StoreOrder;
 use app\admin\model\system\SystemConfig;
 use service\PHPExcelService;
@@ -48,8 +48,8 @@ class MatchCombination extends ModelBasic
     public static function systemPage($where){
         $model = self::setWhere($where)->limit(bcmul($where['page'],$where['limit'],0),$where['limit']);
         return self::page($model,function ($item){
-            $item['count_people_all'] = StorePink::getCountPeopleAll($item['id']);//参与人数
-            $item['count_people_pink'] = StorePink::getCountPeoplePink($item['id']);//成团人数
+            $item['count_people_all'] = MatchPink::getCountPeopleAll($item['id']);//参与人数
+            $item['count_people_pink'] = MatchPink::getCountPeoplePink($item['id']);//成团人数
             $item['count_people_browse'] = self::getVisitPeople($item['id']);//访问人数
         },$where,$where['limit']);
     }
@@ -110,8 +110,8 @@ class MatchCombination extends ModelBasic
         $statistics['browseCount'] = self::field('sum(browse) as browse')->find()->toArray()['browse'];//总展现量
         $statistics['browseCount'] = $statistics['browseCount'] ? $statistics['browseCount'] : 0;
         $statistics['visitCount'] = Db::name('store_visit')->where('product_type','combination')->count();//访客人数
-        $statistics['partakeCount'] = StorePink::getCountPeopleAll();//参与人数
-        $statistics['pinkCount'] = StorePink::getCountPeoplePink();//成团数量
+        $statistics['partakeCount'] = MatchPink::getCountPeopleAll();//参与人数
+        $statistics['pinkCount'] = MatchPink::getCountPeoplePink();//成团数量
         return compact('statistics');
     }
 
