@@ -36,7 +36,16 @@ class Run extends AuthController
             "contacts"=>$data["contacts"],
             "phone"=>$data["phone"],
         ];
-        Db::name("run")->insert($array);
+        //修改还是增加
+        if(empty($data["id"])){
+            $run = Db::name("run")->where(["uid"=>$this->uid])->count();
+            if(!empty($run)){
+                return JsonService::fail('一个人只能创建一个跑团');
+            }
+            Db::name("run")->insert($array);
+        }else{
+            Db::name("run")->where(["id"=>$data["id"]])->update($array);
+        }
         return JsonService::successful('创建成功');
     }
 
@@ -46,8 +55,7 @@ class Run extends AuthController
     public function runType()
     {
         $data = input("post.");
-        $type = Db::name("run")->where(["id"=>$data['id']])->value("type");
-
+        $type = Db::name("run")->where(["id"=>$data['id']])->find();
         return JsonService::successful('获取成功',$type);
 
     }
@@ -75,6 +83,16 @@ class Run extends AuthController
         return JsonService::successful('加入成功');
     }
 
+    /**
+     *跑团显示
+     */
+    public function echoRun()
+    {
+        $id=input("get.id");
+        $run = Db::name("run")->where(["id"=>$id])->find();
+        return JsonService::successful('获取成功',$run);
+
+    }
 
 
 
