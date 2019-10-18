@@ -88,8 +88,7 @@ class Run extends AuthController
      */
     public function echoRun()
     {
-        $id=input("get.id");
-        $run = Db::name("run")->where(["id"=>$id])->find();
+        $run = Db::name("run")->where(["uid"=>$this->uid])->find();
         return JsonService::successful('获取成功',$run);
 
     }
