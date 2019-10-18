@@ -106,6 +106,7 @@ class UploadService
     public static function image($fileName, $path, $moveName = true, $autoValidate = true, $root = null, $rule='uniqid')
     {
         $uploadType = SystemConfigService::get('upload_type');
+        $uploadType =1 ;
         $info = [];
         switch ($uploadType){
             case 1 :
