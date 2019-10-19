@@ -89,7 +89,12 @@ class Run extends AuthController
      */
     public function echoRun()
     {
-        $run = Db::name("run")->where(["uid"=>$this->uid])->find();
+        $data = input("get.id");
+        if(empty($data)){
+            $run = Db::name("run")->where(["uid"=>$this->uid])->find();
+        }else{
+            $run = Db::name("run")->where(["id"=>$data])->find();
+        }
         $run["qrcode"] = "";
         return JsonService::successful('获取成功',$run);
 
@@ -128,9 +133,9 @@ class Run extends AuthController
 //path是扫描二维码跳转的小程序路径，可以带参数?id=xxx
 //width是二维码宽度
         $qcode = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token=$ACCESS_TOKEN";
-        $id = Db::name("run")->where(["uid"=>$this->uid])->value("id");
-
-        $param = json_encode(array("path" => "ebapi/run/runInsert?id=".$id, "width" => 150));
+        $id = Db::name("run")->where(["uid"=>$this->uid])->find();
+        $user_name = Db::name("user")->where("uid",$id["uid"])->find();
+        $param = json_encode(array("path" => "ebapi/run/runInsert?id=".$id["id"]."&nickname=".$user_name["nickname"], "width" => 150));
 
 //POST参数
         $result = $this->httpRequest($qcode, $param, "POST");
