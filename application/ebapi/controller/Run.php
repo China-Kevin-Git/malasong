@@ -90,6 +90,7 @@ class Run extends AuthController
     public function echoRun()
     {
         $run = Db::name("run")->where(["uid"=>$this->uid])->find();
+        $run["qrcode"] = "";
         return JsonService::successful('获取成功',$run);
 
     }
@@ -114,7 +115,7 @@ class Run extends AuthController
 
             $json =$this->httpRequest($access_token);
             $json = json_decode($json, true);
-//             var_dump($json);
+             var_dump($json);
             $_SESSION['access_token'] = $json['access_token'];
             $_SESSION['expires_in'] = time() + 7200;
             $ACCESS_TOKEN = $json["access_token"];
