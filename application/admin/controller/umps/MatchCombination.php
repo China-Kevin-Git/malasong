@@ -3,6 +3,7 @@
 namespace app\admin\controller\umps;
 
 use app\admin\controller\AuthController;
+use app\admin\model\match\macth;
 use service\FormBuilder as Form;
 use traits\CurdControllerTrait;
 use service\UtilService as Util;
@@ -69,7 +70,7 @@ class MatchCombination extends AuthController
 
     public function combination($id = 0){
         if(!$id) return $this->failed('数据不存在');
-        $product = ProductModel::get($id);
+        $product = macth::get($id);
         if(!$product) return Json::fail('数据不存在!');
         $f = array();
         $f[] = Form::hidden('product_id',$id);

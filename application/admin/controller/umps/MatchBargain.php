@@ -271,7 +271,7 @@ class MatchBargain extends AuthController
      */
     public function bargain($id = 0){
         if(!$id) return $this->failed('数据不存在');
-        $product = ProductModel::get($id);
+        $product = macth::get($id);
         if(!$product) return Json::fail('数据不存在!');
         $f = array();
         $f[] = Form::input('title','砍价活动名称');
