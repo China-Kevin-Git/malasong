@@ -473,6 +473,9 @@ class Macth extends AuthController
      */
     public function article_commen(){
         $data = input("post.");
+        if (empty($data["artilce_id"])){
+            return self::asJson([],400,"确实参数");
+        }
         $data["uid"] = $this->uid;
         $data["add_time"] = time();
         Db::name("article_comment")->insert($data);

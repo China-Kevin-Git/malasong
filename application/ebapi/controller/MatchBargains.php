@@ -28,9 +28,11 @@ class MatchBargains extends AuthController
      * TODO 获取砍价列表参数
      */
     public function get_bargain_config(){
-        $info = [
-            "http://chinb.org/system/images/20191012003902.png"
-        ];
+//        $info = [
+//            "http://chinb.org/system/images/20191012003902.png"
+//        ];
+        $lovely = GroupDataService::getData('routine_lovely')?:[];//banner图
+        $info = isset($lovely[2]) ? $lovely[2] : [];
         return JsonService::successful($info);
     }
 
