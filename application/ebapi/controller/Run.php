@@ -95,7 +95,8 @@ class Run extends AuthController
         }else{
             $run = Db::name("run")->where(["id"=>$data])->find();
         }
-        $run["qrcode"] = "";
+
+        $run["qrcode"] = $this->qrCode();
         return JsonService::successful('获取成功',$run);
 
     }
@@ -106,8 +107,8 @@ class Run extends AuthController
     public function qrCode()
     {
         //配置APPID、APPSECRET
-        $APPID = "wx73f6fda2165a0899";
-        $APPSECRET = "67a712eeb331e680bfd0e0c29f8767f3";
+        $APPID = "wx8d0ed4c58830b0ab";
+        $APPSECRET = "ad1a26f2e5854f81b5803b52dcc6fdf0";
 //获取access_token
         $access_token = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$APPID&secret=$APPSECRET";
 //缓存access_token
@@ -120,7 +121,6 @@ class Run extends AuthController
 
             $json =$this->httpRequest($access_token);
             $json = json_decode($json, true);
-             var_dump($json);
             $_SESSION['access_token'] = $json['access_token'];
             $_SESSION['expires_in'] = time() + 7200;
             $ACCESS_TOKEN = $json["access_token"];
@@ -139,9 +139,10 @@ class Run extends AuthController
 
 //POST参数
         $result = $this->httpRequest($qcode, $param, "POST");
+        return $result;
 //生成二维码
-        file_put_contents("qrcode.png", $result);
-        $base64_image = "data:image/jpeg;base64," . base64_encode($result);
+//        file_put_contents("qrcode.png", $result);
+//        $base64_image = "data:image/jpeg;base64," . base64_encode($result);
     }
 
 
