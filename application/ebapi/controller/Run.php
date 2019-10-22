@@ -95,7 +95,6 @@ class Run extends AuthController
         }else{
             $run = Db::name("run")->where(["id"=>$data])->find();
         }
-
         $run["qrcode"] = $this->qrCode();
         return JsonService::successful('获取成功',$run);
 
@@ -139,10 +138,10 @@ class Run extends AuthController
 
 //POST参数
         $result = $this->httpRequest($qcode, $param, "POST");
-        return $result;
 //生成二维码
-//        file_put_contents("qrcode.png", $result);
-//        $base64_image = "data:image/jpeg;base64," . base64_encode($result);
+        file_put_contents("qrcode.png", $result);
+        $base64_image = "data:image/jpeg;base64," . base64_encode($result);
+        return $base64_image;
     }
 
 
