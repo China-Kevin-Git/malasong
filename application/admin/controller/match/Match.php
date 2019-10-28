@@ -151,7 +151,7 @@ class Match extends AuthController
 
     public function edit($id){
         if(!$id) return $this->failed('参数错误');
-        $article = Db::name("match")->find();
+        $article = Db::name("match")->where('id',$id)->find();
         if(!$article) return Json::fail('数据不存在!');
         $f = array();
         $f[] = Form::select('match_catrgory_id','父级id',(string)$article['match_catrgory_id'])->setOptions(function(){
@@ -193,7 +193,6 @@ class Match extends AuthController
         $data = Util::postMore([
             'match_name',
             'match_catrgory_id',
-            'content',
             'image',
             ['address',[]],
             ['limit_time',[]],
@@ -218,12 +217,12 @@ class Match extends AuthController
 
         $data['match'] =json_encode($data);
         Db::name("match")->where(["id"=>$id])->update($data);
-        $match_follow['match_id'] = Db::name("match")->getLastInsID();
+        $match_follow['match_id'] = $id;
         $match_follow['match_name'] = $data['match_name'];
         $match_follow['city'] = $data['city'];
         $match_follow['area'] = $data['area'];
         $match_follow['create_at'] = time();
-        $match = Db::name("match_follow")->where(["id"=>$id])->update($match_follow);
+        $match = Db::name("match_follow")->where(["match_id"=>$id])->update($match_follow);
         if(!$match) return Json::fail('修改失败');
         return Json::successful('修改成功!');
     }

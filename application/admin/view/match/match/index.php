@@ -8,7 +8,7 @@
 
             <div class="ibox-title">
 
-                <button type="button" class="btn btn-w-m btn-primary add-filed">添加赛事分类</button>
+                <button type="button" class="btn btn-w-m btn-primary add-filed">添加赛事</button>
 
             </div>
             <div class="ibox-content">
@@ -27,7 +27,7 @@
                         <tr>
 
                             <th>编号</th>
-                            <th>分类昵称</th>
+                            <th>赛事昵称</th>
                             <th>赛事结束时间</th>
                             <th>报名截止时间</th>
                             <th>地址</th>
