@@ -446,8 +446,6 @@ class Macth extends AuthController
                 $match_goods_price+=$match_goods*$v["num"];
             }
 
-
-
         }
         $order_price=$pricee+$meal_price+$match_goods_price;
 

@@ -122,6 +122,9 @@ class Match extends AuthController
         if(empty($data['image'])) return Json::fail('请选择赛事图片，并且只能上传一张');
         if(empty($data['address'])) return Json::fail('地址不能为空');
 
+        $count = Db::name("match")->where('match_name',$data['match_name'])->count();
+        if(!empty($count)) return Json::fail('赛事名称不能重复');
+
         $data['create_at'] = time();
         $data['logo'] = $data['image'][0];
         $data['province'] = $data['address'][0];
@@ -204,6 +207,11 @@ class Match extends AuthController
         if(!$data['match_catrgory_id']) return Json::fail('请输入赛分类名称');
         if(empty($data['image'])) return Json::fail('请选择赛事图片，并且只能上传一张');
         if(empty($data['address'])) return Json::fail('地址不能为空');
+        $count = Db::name("match")->where('id',$id)->value("match_name");
+        if($count != $data['match_name']){
+            $count = Db::name("match")->where('id',$id)->value("match_name");
+            if(!empty($count)) return Json::fail('赛事名称不能重复');
+        }
 
         $data['create_at'] = time();
         $data['logo'] = $data['image'];
