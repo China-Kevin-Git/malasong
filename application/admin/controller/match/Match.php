@@ -66,7 +66,7 @@ class Match extends AuthController
 
         $f[] = Form::input('match_name','赛事名字');
         //省市二级联动组件
-        $f[] = Form::city('address','比赛地址',[]);
+        $f[] = Form::cityArea('address','比赛地址',[]);
         //日期区间选择组件
         $f[] = Form::dateRange(
             'limit_time',
@@ -124,8 +124,9 @@ class Match extends AuthController
 
         $data['create_at'] = time();
         $data['logo'] = $data['image'][0];
-        $data['city'] = $data['address'][0];
-        $data['area'] = $data['address'][1];
+        $data['province'] = $data['address'][0];
+        $data['city'] = $data['address'][1];
+        $data['area'] = $data['address'][2];
         $data['match_starat'] =strtotime($data['limit_time'][0]) ;
         $data['match_stop'] =strtotime($data['limit_time'][1]) ;
         unset($data['address']);
@@ -135,6 +136,7 @@ class Match extends AuthController
         Db::name("match")->insert($data);
         $match_follow['match_id'] = Db::name("match")->getLastInsID();
         $match_follow['match_name'] = $data['match_name'];
+        $match_follow['province'] = $data['province'];
         $match_follow['city'] = $data['city'];
         $match_follow['area'] = $data['area'];
         $match_follow['create_at'] = time();
@@ -164,7 +166,7 @@ class Match extends AuthController
 
         $f[] = Form::input('match_name','赛事名字',$article['match_name']);
         //省市二级联动组件
-        $f[] = Form::city('address','比赛地址',[$article['city'],$article['area']]);
+        $f[] = Form::cityArea('address','比赛地址',[$article['province'],$article['city'],$article['area']]);
         //日期区间选择组件
         $f[] = Form::dateRange(
             'limit_time',
@@ -205,9 +207,9 @@ class Match extends AuthController
 
         $data['create_at'] = time();
         $data['logo'] = $data['image'];
-
-        $data['city'] = $data['address'][0];
-        $data['area'] = $data['address'][1];
+        $data['province'] = $data['address'][0];
+        $data['city'] = $data['address'][1];
+        $data['area'] = $data['address'][2];
         $data['match_starat'] =strtotime($data['limit_time'][0]) ;
         $data['match_stop'] =strtotime($data['limit_time'][1]) ;
 

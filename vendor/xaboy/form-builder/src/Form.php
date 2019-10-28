@@ -71,7 +71,7 @@ class Form
      *
      * @var bool
      */
-    protected $loadCityAreaData = false;
+    protected $loadCityAreaData = true;
 
     /**
      * @var array
