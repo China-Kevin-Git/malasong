@@ -492,6 +492,7 @@ class Macth extends AuthController
         $comment = Db::name("article_comment")
             ->field("uid,content,add_time")
             ->where(["artilce_id"=>$data["artilce_id"]])
+            ->where(["type"=>1])
             ->order("add_time desc")
             ->page($data["page"],$data["size"])
             ->select();
@@ -590,8 +591,32 @@ class Macth extends AuthController
      */
     public function myComment()
     {
-        $article_comment = Db::name("article_comment")->where(["uid",$this->uid])->select();
+        $article_comment = Db::name("article_comment")->where(["uid"=>$this->uid])->order("add_time desc")->select();
 
+        foreach ($article_comment as $k=>$v){
+            $article_comment[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+            if($v["type"]==0){
+                $article_comment[$k]["type_name"] = "审核中";
+            }elseif ($v["type"]==1){
+                $article_comment[$k]["type_name"] = "发布成功";
+            }else{
+                $article_comment[$k]["type_name"] = "发布失败";
+            }
+        }
+        return self::asJson($article_comment,200,"获取成功");
+    }
+
+    /**
+     * 评论我的
+     */
+    public function CommentMy()
+    {
+        $article = Db::name("article")->where(["uid"=>$this->uid])->column("id");
+        $article_comment = Db::name("article_comment")->where("artilce_id","in",$article)->order("add_time desc")->select();
+        foreach ($article_comment as $k=>$v){
+            $article_comment[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+        }
+        return self::asJson($article_comment,200,"获取成功");
     }
 
 
