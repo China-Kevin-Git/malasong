@@ -11,7 +11,7 @@ use think\Db;
  * Class ArticleApi
  * @package app\ebapi\controller
  */
-class ArticleApi extends Basic
+class ArticleApi extends AuthController
 {
 
     /**
@@ -69,7 +69,7 @@ class ArticleApi extends Basic
         $content["cart_name"] = ArticleCategory::getArticleCategoryField($content['cid']);
         $content['add_time'] = date('Y-m-d H:i:s',$content['add_time']);
         $content['comment_num'] = Db::name("article_comment")->where(["artilce_id"=>$id])->count();
-         $news = Db::name("news")->where(["artilce_id"=>$id,"uid"=>$this->uid])->count();
+         $news = Db::name("news")->where(["article_id"=>$id,"uid"=>$this->uid])->count();
          if(empty($news)){
              $content['is_news'] = 0;
          }else{
