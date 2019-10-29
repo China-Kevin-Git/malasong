@@ -132,6 +132,7 @@ class Match extends AuthController
         $data['area'] = $data['address'][2];
         $data['match_starat'] =strtotime($data['limit_time'][0]) ;
         $data['match_stop'] =strtotime($data['limit_time'][1]) ;
+        $data['enroll_time'] =strtotime($data['enroll_time']);
         unset($data['address']);
         unset($data['limit_time']);
         unset($data['image']);
@@ -191,8 +192,6 @@ class Match extends AuthController
 
     }
 
-
-
     public function update(Request $request, $id)
     {
         $data = Util::postMore([
@@ -202,14 +201,13 @@ class Match extends AuthController
             ['address',[]],
             ['limit_time',[]],
             'enroll_time',],$request);
-
         if(!$data['match_name']) return Json::fail('请输入赛事名称');
         if(!$data['match_catrgory_id']) return Json::fail('请输入赛分类名称');
         if(empty($data['image'])) return Json::fail('请选择赛事图片，并且只能上传一张');
         if(empty($data['address'])) return Json::fail('地址不能为空');
         $count = Db::name("match")->where('id',$id)->value("match_name");
         if($count != $data['match_name']){
-            $count = Db::name("match")->where('id',$id)->value("match_name");
+            $count = Db::name("match")->where('match_name',$data['match_name'])->count();
             if(!empty($count)) return Json::fail('赛事名称不能重复');
         }
 
@@ -218,21 +216,23 @@ class Match extends AuthController
         $data['province'] = $data['address'][0];
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
-        $data['match_starat'] =strtotime($data['limit_time'][0]) ;
-        $data['match_stop'] =strtotime($data['limit_time'][1]) ;
+        $data['match_starat'] =strtotime($data['limit_time'][0]);
+        $data['match_stop'] =strtotime($data['limit_time'][1]);
+        $data['enroll_time'] =strtotime($data['enroll_time']);
 
         unset($data['address']);
         unset($data['limit_time']);
         unset($data['image']);
 
         $data['match'] =json_encode($data);
-        Db::name("match")->where(["id"=>$id])->update($data);
+        $match =Db::name("match")->where(["id"=>$id])->update($data);
         $match_follow['match_id'] = $id;
         $match_follow['match_name'] = $data['match_name'];
         $match_follow['city'] = $data['city'];
         $match_follow['area'] = $data['area'];
         $match_follow['create_at'] = time();
-        $match = Db::name("match_follow")->where(["match_id"=>$id])->update($match_follow);
+         Db::name("match_follow")->where(["match_id"=>$id])->update($match_follow);
+
         if(!$match) return Json::fail('修改失败');
         return Json::successful('修改成功!');
     }

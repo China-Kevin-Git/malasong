@@ -24,7 +24,7 @@ class MacthSeckil extends AuthController
      */
     public function seckill_index(){
         $data["banner"]=[
-            "http://chinb.org/system/images/20191012003902.png"
+            "http://chinb.org/public/system/images/20191012003902.png"
         ];
         $data["seckill"] = Db::name("match_seckill")->field("id,image,product_id,title,price,stop_time")->where("stop_time",">",time())->select();
         foreach ($data["seckill"] as $k=>$v){

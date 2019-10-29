@@ -296,7 +296,7 @@ class MatchBargains extends AuthController
         }
 
         $seckill = Db::name("match_bargain")->field("id,product_id,image,title,price,stop_time,min_price")->where(["id"=>$data["bargainId"]])->find();
-        $price = MatchBargainUser::getBargainUserDiffPriceFloat($data["bargainId"]);
+        $price = $seckill["min_price"];
         $add=[
             "uid"=>$this->uid,
             "match_id"=>$seckill["product_id"],

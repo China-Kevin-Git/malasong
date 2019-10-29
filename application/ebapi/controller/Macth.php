@@ -515,5 +515,74 @@ class Macth extends AuthController
         return self::asJson();
     }
 
+    /**
+     * 赛事添加关注
+     */
+    public function attention()
+    {
+        $data = input("post.");
+        $match_attention = Db::name("match_attention")->where(["uid"=>$this->uid,"match_id"=>$data["match_id"]])->count();
+        if(!empty($match_attention)){
+            return self::asJson([],400,"请不要重复关注");
+        }
+        Db::name("match_attention")->insert(["uid"=>$this->uid,"match_id"=>$data["match_id"]]);
+        Db::name("match")->where("id",$data["match_id"])->setInc('num');
+        return self::asJson([],200,"关注成功");
+    }
+
+    /**
+     * 我的关注赛事
+     */
+    public function myAttention()
+    {
+        $match_attention = Db::name("match_attention")->where(["uid"=>$this->uid])->select();
+        $data= [];
+        foreach ($match_attention as $k=>$v){
+            $data[$k] = Db::name("match")->field("id,match_starat,match_name,province,city,area,num,logo")->where("id",$v["match_id"])->find();
+            $data[$k]["match_starat"] = date("Y-m-d",$data[$k]["match_starat"]);
+        }
+        return self::asJson($data,200,"获取成功");
+    }
+
+    /**
+     * 新闻添加关注
+     */
+    public function news()
+    {
+        $data = input("post.");
+        $match_attention = Db::name("news")->where(["uid"=>$this->uid,"article_id"=>$data["article_id"]])->count();
+        if(!empty($match_attention)){
+            return self::asJson([],400,"请不要重复关注");
+        }
+        Db::name("news")->insert(["uid"=>$this->uid,"article_id"=>$data["article_id"]]);
+        Db::name("article")->where("id",$data["article_id"])->setInc('num');
+        return self::asJson([],200,"关注成功");
+    }
+
+    /**
+     * 新闻点赞
+     */
+    public function zan()
+    {
+        $data = input("post.");
+        Db::name("article")->where("id",$data["article_id"])->setInc('zan_num');
+        return self::asJson([],200,"点赞成功");
+    }
+
+    /**
+     * 我的关注新闻
+     *
+     */
+    public function myAtt()
+    {
+        $match_attention = Db::name("news")->where(["uid"=>$this->uid])->select();
+        $data= [];
+        foreach ($match_attention as $k=>$v){
+            $data[$k] = Db::name("article")->field("id,title,image_input,add_time")->where("id",$v["article_id"])->find();
+            $data[$k]["add_time"] = date("Y-m-d",$data[$k]["add_time"]);
+        }
+        return self::asJson($data,200,"获取成功");
+    }
+
 
 }
