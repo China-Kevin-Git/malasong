@@ -510,7 +510,6 @@ class Macth extends AuthController
     public function cancel()
     {
         $data = input("post.");
-
         Db::name("match_order")->where(["match_order_sn"=>$data["match_order_sn"]])->update(["is_pay"=>3]);
         return self::asJson();
     }

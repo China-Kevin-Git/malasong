@@ -156,7 +156,7 @@
         setTime();
     });
     layList.search('export',function(where){
-        location.href=layList.U({c:'ump.store_combination',a:'save_excel',q:{
+        location.href=layList.U({c:'umps.match_combination',a:'save_excel',q:{
             is_show:where.is_show,
             store_name:where.store_name
         }});
@@ -178,7 +178,7 @@
     layList.switch('status',function (odj,value,name) {
         if (odj.elem.checked == true) {
             layList.baseGet(layList.Url({
-                c: 'ump.store_combination',
+                c: 'umps.match_combination',
                 a: 'set_combination_status',
                 p: {status: 1, id: value}
             }), function (res) {
@@ -186,7 +186,7 @@
             });
         } else {
             layList.baseGet(layList.Url({
-                c: 'ump.store_combination',
+                c: 'umps.match_combination',
                 a: 'set_combination_status',
                 p: {status: 0, id: value}
             }), function (res) {
@@ -197,7 +197,7 @@
     layList.tool(function (event,data,obj) {
         switch (event) {
             case 'delstor':
-                var url=layList.U({c:'ump.store_combination',a:'delete',q:{id:data.id}});
+                var url=layList.U({c:'umps.match_combination',a:'delete',q:{id:data.id}});
                 $eb.$swal('delete',function(){
                     $eb.axios.get(url).then(function(res){
                         if(res.status == 200 && res.data.code == 200) {
