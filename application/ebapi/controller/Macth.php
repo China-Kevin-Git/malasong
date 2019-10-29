@@ -585,5 +585,14 @@ class Macth extends AuthController
         return self::asJson($data,200,"获取成功");
     }
 
+    /**
+     * 我的评论
+     */
+    public function myComment()
+    {
+        $article_comment = Db::name("article_comment")->where(["uid",$this->uid])->select();
+
+    }
+
 
 }
