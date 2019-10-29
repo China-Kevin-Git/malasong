@@ -330,7 +330,7 @@ class MatchSeckill extends AuthController
      */
     public function set_seckill_status($status,$id = 0){
         if(!$id) return Json::fail('参数错误');
-        $res = MatchSeckillModel::edit(['status'=>$status],$id);
+        $res = MatchSeckillModel::edit(['is_show'=>$status],$id);
         if($res) return Json::successful('修改成功');
         else return Json::fail('修改失败');
     }
