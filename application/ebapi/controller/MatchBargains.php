@@ -29,7 +29,7 @@ class MatchBargains extends AuthController
      */
     public function get_bargain_config(){
         $info = [
-            "http://chinb.org/system/images/20191012003902.png"
+            "http://chinb.org/public/system/images/20191012003902.png"
         ];
         return JsonService::successful($info);
     }
