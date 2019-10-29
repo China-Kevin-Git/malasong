@@ -290,7 +290,7 @@ class MatchBargain extends AuthController
         $form = Form::make_post_form('开启砍价活动',$f,Url::build('update'));
         $this->assign(compact('form'));
         return $this->fetch('public/form-builder');
-        
+
     }
     /**
      * 修改砍价状态
