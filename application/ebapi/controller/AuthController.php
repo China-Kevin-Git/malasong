@@ -25,6 +25,9 @@ class AuthController extends Basic
         "crfy",
         "get_combination_list",
         "homeIndex",
+        "get_article",
+        "get_cid_article",
+        "article_desc",
 
     ];
 

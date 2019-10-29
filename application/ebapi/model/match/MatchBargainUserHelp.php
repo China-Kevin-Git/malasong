@@ -48,6 +48,13 @@ class MatchBargainUserHelp extends ModelBasic
      * @throws \think\exception\DbException
      */
     public static function setBargainUserHelp($bargainId = 0,$bargainUserUid = 0,$uid = 0){
+//        dump(!self::isBargainUserHelpCount($bargainId,$bargainUserUid,$uid));
+//        dump(!$bargainId);
+//        dump(!$bargainUserUid);
+//        dump(!$uid);
+//        dump(!MatchBargain::validBargain($bargainId));
+//        dump(!MatchBargainUser::be(['bargain_id'=>$bargainId,'uid'=>$bargainUserUid,'status'=>1,'is_del'=>0]));
+//        dump(MatchBargainUser::be(['bargain_id'=>$bargainId,'uid'=>$bargainUserUid,'status'=>1,'is_del'=>0]));
         if(!self::isBargainUserHelpCount($bargainId,$bargainUserUid,$uid) || !$bargainId || !$bargainUserUid || !$uid || !MatchBargain::validBargain($bargainId) || !MatchBargainUser::be(['bargain_id'=>$bargainId,'uid'=>$bargainUserUid,'status'=>1,'is_del'=>0])) return false;
         $bargainUserTableId = MatchBargainUser::getBargainUserTableId($bargainId,$bargainUserUid);//TODO 获取 用户参与砍价表编号
         $priceSection = MatchBargain::getBargainMaxMinPrice($bargainId); //TODO 获取随机砍掉的价格区间
@@ -92,9 +99,12 @@ class MatchBargainUserHelp extends ModelBasic
      * @throws \think\Exception
      */
     public static function isBargainUserHelpCount($bargainId = 0,$bargainUserUid = 0,$bargainUserHelpUid = 0){
+
         $bargainUserTableId = MatchBargainUser::getBargainUserTableId($bargainId,$bargainUserUid);
+
         $bargainNum = MatchBargain::getBargainNum($bargainId);//TODO 获取每个人可以砍价几次
         $count = self::where('bargain_id',$bargainId)->where('bargain_user_id',$bargainUserTableId)->where('uid',$bargainUserHelpUid)->count();//TODO 获取当前用户砍价了几次
+
         if($count < $bargainNum) return true;
         else return false;
     }
