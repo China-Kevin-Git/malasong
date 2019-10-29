@@ -3,6 +3,8 @@
 namespace app\ebapi\controller;
 
 use app\common\service\MacthService;
+use FormBuilder\components\Upload;
+use think\config\driver\Json;
 use think\Db;
 use think\Request;
 
@@ -483,6 +485,7 @@ class Macth extends AuthController
         $comment = Db::name("article_comment")
             ->field("uid,content,add_time")
             ->where(["artilce_id"=>$data["artilce_id"]])
+            ->where(["type"=>1])
             ->order("add_time desc")
             ->page($data["page"],$data["size"])
             ->select();
@@ -503,9 +506,137 @@ class Macth extends AuthController
     public function cancel()
     {
         $data = input("post.");
-
         Db::name("match_order")->where(["match_order_sn"=>$data["match_order_sn"]])->update(["is_pay"=>3]);
         return self::asJson();
+    }
+
+    /**
+     * 赛事添加关注
+     */
+    public function attention()
+    {
+        $data = input("post.");
+        $match_attention = Db::name("match_attention")->where(["uid"=>$this->uid,"match_id"=>$data["match_id"]])->count();
+        if(!empty($match_attention)){
+            return self::asJson([],400,"请不要重复关注");
+        }
+        Db::name("match_attention")->insert(["uid"=>$this->uid,"match_id"=>$data["match_id"]]);
+        Db::name("match")->where("id",$data["match_id"])->setInc('num');
+        return self::asJson([],200,"关注成功");
+    }
+
+    /**
+     * 我的关注赛事
+     */
+    public function myAttention()
+    {
+        $match_attention = Db::name("match_attention")->where(["uid"=>$this->uid])->select();
+        $data= [];
+        if(empty($match_attention)){
+            return self::asJson($data,200,"获取成功");
+        }
+
+        foreach ($match_attention as $k=>$v){
+            $data[$k] = Db::name("match")->field("id,match_starat,match_name,province,city,area,num,logo")->where("id",$v["match_id"])->find();
+            $data[$k]["match_starat"] = date("Y-m-d",$data[$k]["match_starat"]);
+        }
+        return self::asJson($data,200,"获取成功");
+    }
+
+    /**
+     * 新闻添加关注
+     */
+    public function news()
+    {
+        $data = input("post.");
+        $match_attention = Db::name("news")->where(["uid"=>$this->uid,"article_id"=>$data["article_id"]])->count();
+        if(!empty($match_attention)){
+            return self::asJson([],400,"请不要重复关注");
+        }
+        Db::name("news")->insert(["uid"=>$this->uid,"article_id"=>$data["article_id"]]);
+        Db::name("article")->where("id",$data["article_id"])->setInc('num');
+        return self::asJson([],200,"关注成功");
+    }
+
+    /**
+     * 新闻点赞
+     */
+    public function zan()
+    {
+        $data = input("post.");
+        Db::name("article")->where("id",$data["article_id"])->setInc('zan_num');
+        return self::asJson([],200,"点赞成功");
+    }
+
+    /**
+     * 我的关注新闻
+     *
+     */
+    public function myAtt()
+    {
+        $match_attention = Db::name("news")->where(["uid"=>$this->uid])->select();
+        $data= [];
+        if(empty($match_attention)){
+            return self::asJson($data,200,"获取成功");
+        }
+        foreach ($match_attention as $k=>$v){
+            $data[$k] = Db::name("article")->field("id,title,image_input,add_time")->where("id",$v["article_id"])->find();
+            $data[$k]["add_time"] = date("Y-m-d",$data[$k]["add_time"]);
+        }
+        return self::asJson($data,200,"获取成功");
+    }
+
+    /**
+     * 我的评论
+     */
+    public function myComment()
+    {
+        $article_comment = Db::name("article_comment")->where(["uid"=>$this->uid])->order("add_time desc")->select();
+
+        foreach ($article_comment as $k=>$v){
+            $article_comment[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+            if($v["type"]==0){
+                $article_comment[$k]["type_name"] = "审核中";
+            }elseif ($v["type"]==1){
+                $article_comment[$k]["type_name"] = "发布成功";
+            }else{
+                $article_comment[$k]["type_name"] = "发布失败";
+            }
+        }
+        return self::asJson($article_comment,200,"获取成功");
+    }
+
+    /**
+     * 评论我的
+     */
+    public function CommentMy()
+    {
+        $article = Db::name("article")->where(["uid"=>$this->uid])->column("id");
+        $article_comment = Db::name("article_comment")->where("artilce_id","in",$article)->order("add_time desc")->select();
+        foreach ($article_comment as $k=>$v){
+            $article_comment[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+        }
+        return self::asJson($article_comment,200,"获取成功");
+    }
+
+    /**
+     * 图片上传
+     */
+    public function upload(){
+        // 获取表单上传文件 例如上传了001.jpg
+        $file = request()->file('file');
+        // 移动到框架应用根目录/public/uploads/ 目录下
+        $info = $file->validate(['ext'=>'jpg,png,gif'])->move(ROOT_PATH . 'public' . DS . 'uploads');
+        if($info){
+
+            //获取图片的存放相对路径
+            $filePath = 'public' . DS . 'uploads'. DS .$info->getSaveName();
+            $getInfo = $info->getInfo();
+            return self::asJson($_SERVER['SERVER_NAME']."\\".$filePath,200,"获取成功");
+        }else{
+            // 上传失败获取错误信息
+            echo $file->getError();
+        }
     }
 
 

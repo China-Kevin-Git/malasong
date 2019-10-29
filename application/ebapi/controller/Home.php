@@ -24,7 +24,7 @@ class Home extends AuthController
             $v = json_decode($v,true);
             $data["banner"][$k] = $v["pic"]["value"];
         }
-        $data["icon"] = Db::name("store_category")->field("id,cate_name,pic")->order("sort")->select();
+        $data["icon"] = Db::name("store_category")->field("id,cate_name,pic")->where("pid","<>",0)->order("sort")->select();
 
         $data["combination"] = Db::name("store_combination")->field("id,image,product_id,price,title")->where(['is_del'=>0])->order("sort")->select();
         $data["seckill"] = Db::name("store_seckill")->field("id,image,stop_time,product_id,price,title,ot_price")->where("stop_time",'>',time())->where(['is_del'=>0])->order("sort")->select();
