@@ -675,7 +675,7 @@ class Macth extends AuthController
     public function protocol()
     {
         $protocol = Db::name("protocol")->find();
-        return self::asJson($protocol,200,"添加成功");
+        return self::asJson($protocol,200,"获取成功");
     }
 
 
