@@ -90,9 +90,9 @@ class MatchPink extends AuthController
     public function pinkOrder()
     {
         $data = input("post.");
-        $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["id"=>$data["id"]])->find();
+        $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["product_id"=>$data["id"]])->find();
+        $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         if($data["type"]==1){
-            $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
             $add=[
                 "uid"=>$this->uid,
                 "match_id"=>$combination["product_id"],
@@ -101,9 +101,7 @@ class MatchPink extends AuthController
                 "add_time"=>time(),
                 "match_name"=>Db::name("match")->where(["id"=>$combination["product_id"]])->value("match_name"),
             ];
-            Db::name("match_order")->insert($add);
         }elseif($data["type"]==2){
-            $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
             $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"cid"=>$combination["product_id"],"status"=>1])->count();
             if(!empty($count)){
                 return JsonService::fail('该赛事您已经在拼团了');
@@ -111,20 +109,17 @@ class MatchPink extends AuthController
             if(empty($data["tid"])){
                 $data["tid"]= 0;
             }
-            $array = [
+            $add=[
                 "uid"=>$this->uid,
-                "order_id"=>$str,
-                "total_price"=>$combination["price"],
-                "price"=>$combination["price"],
-                "people"=>$combination["people"],
-                "cid"=>$combination["id"],
-                "pid"=>$combination["product_id"],
+                "match_id"=>$combination["product_id"],
+                "order_price"=>$data["amount"],
+                "match_order_sn"=>$str,
                 "add_time"=>time(),
-                "stop_time"=>$combination["stop_time"],
+                "type"=>3,
                 "k_id"=>$data["tid"],
             ];
-            Db::name("match_pink")->insert($array);
         }
+        Db::name("match_order")->insert($add);
         $pay = new AuthApi();
         $pay->pay_order($str);
 

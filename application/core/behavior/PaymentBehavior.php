@@ -73,6 +73,24 @@ class PaymentBehavior
             if (stripos($orderId, 'match-') !== false){
                 $match_order =   Db::name("match_order")->where(["match_order_sn"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
                 $order = Db::name("match_order")->where(["match_order_sn"=>$orderId])->find();
+                if($order["type"==3]){
+                    $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+                    $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["product_id"=>$order["match_id"]])->find();
+                    $array = [
+                        "uid"=>$order["uid"],
+                        "order_id"=>$str,
+                        "total_price"=>$combination["price"],
+                        "price"=>$combination["price"],
+                        "people"=>$combination["people"],
+                        "cid"=>$combination["id"],
+                        "pid"=>$combination["product_id"],
+                        "add_time"=>time(),
+                        "stop_time"=>$combination["stop_time"],
+                        "k_id"=>$order["tid"],
+                    ];
+                    Db::name("match_pink")->insert($array);
+                }
+
                 $run_arr = Db::name("run_arr")->where(["uid"=>$order["uid"]])->value("run_id");
                 if(!empty($run_arr)){
                     $run = Db::name("run")->where("id",$run_arr)->find();
@@ -90,37 +108,6 @@ class PaymentBehavior
                         "status"=>1,
                     ]);
                 }
-
-                if($match_order){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-            //处理业务逻辑
-            if (stripos($orderId, 'pink-') !== false){
-                $match_order =   Db::name("match_pink")->where(["order_id"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
-
-                $order = Db::name("match_pink")->where(["order_id"=>$orderId])->find();
-                $run_arr = Db::name("run_arr")->where(["uid"=>$order["uid"]])->value("run_id");
-                if(!empty($run_arr)){
-                    $run = Db::name("run")->where("id",$run_arr)->find();
-                    $price = round($order["price"]*$run["scale"]/100,2);
-                    Db::name("user")->where("uid",$run['uid'])->setInc("now_money",$price);
-                    Db::name("user_bill")->insert([
-                        "uid"=>$run['uid'],
-                        "link_id"=>$order['uid'],
-                        "pm"=>1,
-                        "title"=>"跑团人员购买赠送",
-                        "category"=>"now_money",
-                        "type"=>"recharge",
-                        "number"=>$price,
-                        "add_time"=>time(),
-                        "status"=>1,
-                    ]);
-                }
-
-
                 if($match_order){
                     return true;
                 }else{
