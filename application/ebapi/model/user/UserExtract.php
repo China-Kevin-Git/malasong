@@ -51,12 +51,12 @@ class UserExtract extends ModelBasic
             return self::setErrorInfo('提现方式不存在');
 //        if($data['extract_type']=='weixin') return self::setErrorInfo('微信提现暂时关闭！');
         $userInfo = User::get($userInfo['uid']);
-        $brokerage = UserBill::getBrokerage($userInfo['uid']);//获取总佣金
-        $extractTotalPrice = self::userExtractTotalPrice($userInfo['uid']);//累计提现
-        $extractPrice = (float)bcsub($brokerage,$extractTotalPrice,2);//减去已提现金额
-        $extractPrice = (float)bcsub($extractPrice,self::userExtractTotalPrice($userInfo['uid'],0),2);//减去提现申请中的金额
-        if($extractPrice < 0) return self::setErrorInfo('提现佣金不足'.$data['money']);
-        if($data['money'] > $extractPrice) return self::setErrorInfo('提现佣金不足'.$data['money']);
+//        $brokerage = UserBill::getBrokerage($userInfo['uid']);//获取总佣金
+//        $extractTotalPrice = self::userExtractTotalPrice($userInfo['uid']);//累计提现
+//        $extractPrice = (float)bcsub($brokerage,$extractTotalPrice,2);//减去已提现金额
+//        $extractPrice = (float)bcsub($extractPrice,self::userExtractTotalPrice($userInfo['uid'],0),2);//
+//        if($extractPrice < 0) return self::setErrorInfo('提现佣金不足'.$data['money']);
+        if($data['money'] > $userInfo['now_money']) return self::setErrorInfo('提现佣金不足'.$data['money']);
         $balance = bcsub($userInfo['now_money'],$data['money'],2);
         if($balance < 0) $balance=0;
         $insertData = [
