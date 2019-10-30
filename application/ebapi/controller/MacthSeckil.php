@@ -59,7 +59,6 @@ class MacthSeckil extends AuthController
         $data = input("post.");
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         $seckill = Db::name("match_seckill")->field("id,product_id,image,title,price,stop_time")->where(["id"=>$data["id"]])->find();
-
         if($seckill["price"]==0){
             $add=[
                 "uid"=>$this->uid,

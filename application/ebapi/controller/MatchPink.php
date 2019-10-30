@@ -71,16 +71,16 @@ class MatchPink extends AuthController
     public function userPink()
     {
         $data = input("post.");
-        $match_pink["userPink"] = Db::name("store_pink")->field("uid,people")->where(["cid"=>$data["id"],"k_id"=>0])->page($data["page"],$data["size"])->select();
+        $match_pink["userPink"] = Db::name("match_pink")->field("uid,people")->where(["cid"=>$data["id"],"k_id"=>0])->page($data["page"],$data["size"])->select();
         foreach ($match_pink["userPink"] as $k=>$v){
             $user = Db::name("user")->where(["uid"=>$v["uid"]])->find();
             $match_pink["userPink"][$k]["nickname"] = $user["nickname"];
             $match_pink["userPink"][$k]["avatar"] = $user["avatar"];
-            $count = Db::name("store_pink")->where(["cid"=>$data["id"],"k_id"=>$v["uid"]])->page($data["page"],$data["size"])->count();
+            $count = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>$v["uid"]])->page($data["page"],$data["size"])->count();
             $match_pink["userPink"][$k]["num"] = $v["people"]-$count;
         }
 
-        $match_pink["pinkNum"] = Db::name("store_pink")->where(["cid"=>$data["id"],"k_id"=>0])->count();
+        $match_pink["pinkNum"] = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>0])->count();
         return JsonService::successful('ok',$match_pink);
     }
 

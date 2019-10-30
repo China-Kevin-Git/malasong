@@ -24,7 +24,7 @@ class ArticleApi extends AuthController
         $cateInfo = ArticleCategory::getArticleCategory();
         if($cateInfo) $cateInfo = $cateInfo->toArray();
         else $cateInfo = [];
-        array_unshift($cateInfo,['id'=>0,'title'=>'热门']);
+//        array_unshift($cateInfo,['id'=>0,'title'=>'热门']);
         return $this->successful($cateInfo);
     }
     /**
