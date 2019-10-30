@@ -637,7 +637,7 @@ class Macth extends AuthController
             $getInfo = $info->getInfo();
             return self::asJson($_SERVER['SERVER_NAME']."\\".$filePath,200,"获取成功");
         }else{
-            // 上传失败获取错误信息
+                // 上传失败获取错误信息
             echo $file->getError();
         }
     }
