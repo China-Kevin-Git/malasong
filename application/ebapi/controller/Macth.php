@@ -3,8 +3,6 @@
 namespace app\ebapi\controller;
 
 use app\common\service\MacthService;
-use FormBuilder\components\Upload;
-use think\config\driver\Json;
 use think\Db;
 use think\Request;
 
@@ -492,7 +490,6 @@ class Macth extends AuthController
         $comment = Db::name("article_comment")
             ->field("uid,content,add_time")
             ->where(["artilce_id"=>$data["artilce_id"]])
-            ->where(["type"=>1])
             ->order("add_time desc")
             ->page($data["page"],$data["size"])
             ->select();
@@ -539,6 +536,10 @@ class Macth extends AuthController
     {
         $match_attention = Db::name("match_attention")->where(["uid"=>$this->uid])->select();
         $data= [];
+        if(empty($match_attention)){
+            return self::asJson($data,200,"获取成功");
+        }
+
         foreach ($match_attention as $k=>$v){
             $data[$k] = Db::name("match")->field("id,match_starat,match_name,province,city,area,num,logo")->where("id",$v["match_id"])->find();
             $data[$k]["match_starat"] = date("Y-m-d",$data[$k]["match_starat"]);
@@ -579,6 +580,9 @@ class Macth extends AuthController
     {
         $match_attention = Db::name("news")->where(["uid"=>$this->uid])->select();
         $data= [];
+        if(empty($match_attention)){
+            return self::asJson($data,200,"获取成功");
+        }
         foreach ($match_attention as $k=>$v){
             $data[$k] = Db::name("article")->field("id,title,image_input,add_time")->where("id",$v["article_id"])->find();
             $data[$k]["add_time"] = date("Y-m-d",$data[$k]["add_time"]);
