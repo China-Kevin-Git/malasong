@@ -366,6 +366,7 @@ class Macth extends AuthController
         if(empty($data['match_order_sn'])){
             return self::asJson([],400,"参数错误");
         }
+        $data["user_id"]=$this->uid;
         Db::name("match_means")->insert($data);
         Db::name("match_order")->where(['match_order_sn'=>$data['match_order_sn']])->update(["status"=>3]);
         return self::asJson();
@@ -397,7 +398,7 @@ class Macth extends AuthController
             ->select();
 
         foreach($match_order as $k=>$v){
-            $match_order[$k]['add_time']=date("Y--m-d",$v['add_time']);
+            $match_order[$k]['add_time']=date("Y-m-d",$v['add_time']);
             $match_order[$k]['logo']=Db::name("match")->where(['id'=>$v['match_id']])->value("logo");
             if($v['is_pay']==0){
                 $match_order[$k]['status_name']="未支付";
