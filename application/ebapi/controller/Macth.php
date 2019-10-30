@@ -328,10 +328,7 @@ class Macth extends AuthController
         if(empty($data['service_id'])){
             $data['service_id']=0;
         }else{
-//            $cart=stripslashes(html_entity_decode($data['service_id']));
-//            $service_id=json_decode($cart,true);
-            $service_id=json_decode($data['service_id'],true);
-            foreach ($service_id as $k=>$v){
+            foreach ($data['service_id'] as $k=>$v){
                 $match_goods = Db::name("match_goods")->where(['service_id'=>$v["service_id"]])->value("price");
                 $match_goods_price+=$match_goods*$v["num"];
                 Db::name("match_order_goods")->insert(['match_order_sn'=>$str,'num'=>$v["num"],'price'=>$match_goods*$v["num"],'add_time'=>time(),'service_id'=>$v["service_id"]]);
@@ -438,11 +435,7 @@ class Macth extends AuthController
         if(empty($data['service_id'])){
             $data['service_id']=0;
         }else{
-//            $cart=stripslashes(html_entity_decode($data['service_id']));
-//            $service_id=json_decode($cart,true);
-            $service_id=json_decode($data['service_id'],true);
-
-            foreach ($service_id as $k=>$v){
+            foreach ($data['service_id'] as $k=>$v){
                 $match_goods = Db::name("match_goods")->where(['service_id'=>$v["service_id"]])->value("price");
                 $match_goods_price+=$match_goods*$v["num"];
             }
