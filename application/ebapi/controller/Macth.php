@@ -349,7 +349,7 @@ class Macth extends AuthController
             "remarks"=>$data["remarks"],
             "red_id"=>$data["red_id"],
             "meal_id"=>$data["meal_id"],
-            "service_id"=>$data["service_id"],
+            "service_id"=>json_encode($data["service_id"]),
             "address_id"=>$data["address_id"],
         ];
         Db::name("match_order")->insert($add);
