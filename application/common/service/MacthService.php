@@ -104,21 +104,19 @@ class MacthService extends Service
     public static function queryFollow($data)
     {
         if(isset($data['city']) && $data['city']){  //本地赛事
-            $follow = Db::table('eb_match_follow')->where(['city' => $data['city']])->page(1,3)->order('create_at desc')->select();
+            $follow = Db::table('eb_match')->where(['city' => $data['city']])->page(1,3)->order('create_at desc')->select();
 
         }else if(isset($data['popular']) && $data['popular']){ //最热赛事
-            $follow = Db::table('eb_match_follow')->page(1,3)->order('follow_num desc')->select();
+            $follow = Db::table('eb_match')->page(1,3)->order('num desc')->select();
         }else if(isset($data['page']) && $data['page']){ //更多
-            $follow = Db::table('eb_match_follow')->page($data['page'],5)->order('create_at desc')->select();
+            $follow = Db::table('eb_match')->page($data['page'],5)->order('create_at desc')->select();
         }else{ //最新
-            $follow = Db::table('eb_match_follow')->page(1,3)->order('create_at desc')->select();
+            $follow = Db::table('eb_match')->page(1,3)->order('create_at desc')->select();
         }
         foreach ($follow as $key => $value){
-            $follow[$key]['create_at'] = date('Y-m-d',$value['create_at']);
-            $follow[$key]['update_at'] = date('Y-m-d',$value['update_at']);
+            $follow[$key]['match_starat'] = date('Y-m-d',$value['match_starat']);
+            $follow[$key]['match_stop'] = date('Y-m-d',$value['match_stop']);
             $follow[$key]['address'] = $value['province'].$value['city'].$value['area'];
-            $follow[$key]['logo'] = Db::name('match')->where(['id'=>$value['match_id']])->value('logo');
-
 
         }
         return self::set_err($follow);
