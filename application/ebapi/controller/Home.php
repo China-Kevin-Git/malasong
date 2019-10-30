@@ -23,7 +23,8 @@ class Home extends AuthController
         $data = [] ;
         foreach ($system as $k=>$v){
             $v = json_decode($v,true);
-            $data["banner"][$k] = $v["pic"]["value"];
+            $data["banner"][$k]["img"] = $v["pic"]["value"];
+            $data["banner"][$k]["url"] = "";
         }
         $data["icon"] = Db::name("store_category")->field("id,cate_name,pic")->where("pid","<>",0)->order("sort")->select();
 

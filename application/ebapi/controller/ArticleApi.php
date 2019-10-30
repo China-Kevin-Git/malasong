@@ -86,7 +86,11 @@ class ArticleApi extends AuthController
     public function get_article()
     {
 
-        $data["banner"] = Db::name("article")->where(["is_banner"=>1])->order("add_time desc")->limit(0,3)->column("image_input");
+        $article = Db::name("article")->where(["is_banner"=>1])->order("add_time desc")->limit(0,3)->select();
+        foreach ($article as $k=>$v){
+            $data["banner"][$k]["img"] = $v["image_input"];
+            $data["banner"][$k]["url"] = $v["url"];
+        }
         $data["article_category"] = Db::name("article_category")->field("id,title")->where(["is_del"=>0])->order("sort")->select();
         return $this->successful($data);
     }
