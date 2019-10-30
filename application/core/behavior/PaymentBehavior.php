@@ -73,7 +73,7 @@ class PaymentBehavior
             if (stripos($orderId, 'match-') !== false){
                 $match_order =   Db::name("match_order")->where(["match_order_sn"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
                 $order = Db::name("match_order")->where(["match_order_sn"=>$orderId])->find();
-                if($order["type"==3]){
+                if($order["type"]==3){
                     $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
                     $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["product_id"=>$order["match_id"]])->find();
                     $array = [
