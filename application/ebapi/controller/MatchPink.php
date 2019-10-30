@@ -90,7 +90,7 @@ class MatchPink extends AuthController
     public function pinkOrder()
     {
         $data = input("post.");
-        $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["product_id"=>$data["id"]])->find();
+        $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["id"=>$data["id"]])->find();
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         if($data["type"]==1){
             $add=[
