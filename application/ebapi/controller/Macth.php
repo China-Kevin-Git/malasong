@@ -363,7 +363,7 @@ class Macth extends AuthController
     public function means()
     {
         $data = input("post.");
-        if(empty($data['match_order_id'])){
+        if(empty($data['match_order_sn'])){
             return self::asJson([],400,"参数错误");
         }
         Db::name("match_means")->insert($data);
