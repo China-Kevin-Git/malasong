@@ -38,7 +38,43 @@ class MatchOrder extends AuthController
         $params = Util::getMore([
             ['keyword','']
         ],$this->request);
-        $this->assign(OrderModel::systemPage($params));
+        if($params['keyword'] == ''){
+            $where = "1=1";
+        }else{
+            $where= 'match_order_sn  LIKE  % '.$params["keyword"].' % ';
+        }
+
+        $match_order= Db::name("match_order")
+            ->alias('a')
+            ->join('user r','r.uid=a.uid','LEFT')
+            ->field('a.*,r.nickname')
+            ->order('a.match_order_id DESC')
+            ->where($where)
+            ->select();
+        foreach ($match_order as $k=>$v){
+            if($v["red_id"]==0){
+                $match_order[$k]["red_name"] = "无";
+            }else{
+                $match_order[$k]["red_name"] = Db::name("match_red")->where(["red_id"=>$v["red_id"]])->value("spec_name");
+            }
+            if($v["meal_id"]==0){
+                $match_order[$k]["meal_name"] = "无";
+            }else{
+                $match_order[$k]["meal_name"] = Db::name("match_meal")->where(["meal_id"=>$v["meal_id"]])->value("title");
+            }
+
+            if($v["service_id"]===0){
+                $match_order[$k]["service_name"] = "无";
+            }else{
+
+                $service_id = json_decode($v["service_id"],true);
+                foreach ($service_id as $j=>$i){
+                    $service_id[$j] = $i["goods_name"].":".$i["price"] ."元 X ".$i["num"]."件";
+                }
+                $match_order[$k]["service_name"] = implode(" , ",$service_id);
+            }
+        }
+        $this->assign("list",$match_order);
         return $this->fetch();
     }
 

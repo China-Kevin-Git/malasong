@@ -39,6 +39,9 @@
                             <th>价格</th>
                             <th>支付状态</th>
                             <th>是否完善资料</th>
+                            <th>选择的赛程</th>
+                            <th>购买的套餐</th>
+                            <th>购买的服务</th>
                             <th>操作</th>
 
                         </tr>
@@ -76,6 +79,18 @@
                             <td class="text-center">
                                 <i class="fa {eq name='vo.status' value='2|3'}fa-check text-navy{else/}fa-close text-danger{/eq}"></i>
                             </td>
+                            <td class="text-center">
+                                {$vo.red_name}
+
+                            </td>
+                            <td class="text-center">
+                                {$vo.meal_name}
+
+                            </td>
+                            <td class="text-center">
+                                {$vo.service_name}
+
+                            </td>
 
                             <td class="text-center">
                                 <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('查看资料','{:Url('means',array('id'=>$vo['match_order_id']))}')"><i class="fa fa-paste"></i> 编辑</button>
@@ -86,7 +101,7 @@
                         </tbody>
                     </table>
                 </div>
-                {include file="public/inner_page"}
+
             </div>
 
         </div>
