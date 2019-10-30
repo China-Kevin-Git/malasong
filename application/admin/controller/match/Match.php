@@ -77,8 +77,6 @@ class Match extends AuthController
             '报名截止时间',
             time()
         );
-
-
         $f[] = Form::frameImageOne('image','赛事图片',Url::build('admin/widget.images/index',array('fodder'=>'image')))->icon('image');
         $form = Form::make_post_form('添加分类',$f,Url::build('save'));
         $this->assign(compact('form'));
@@ -87,7 +85,7 @@ class Match extends AuthController
     }
 
     /**
-     * s上传图片
+     * 上传图片
      * */
     public function upload(){
         $res = Upload::image('file','article');
@@ -113,7 +111,6 @@ class Match extends AuthController
             ['address',[]],
             ['limit_time',[]],
             'enroll_time',],$request);
-
         if(!$data['match_name']) return Json::fail('请输入赛事名称');
         if(!$data['match_catrgory_id']) return Json::fail('请输入赛分类名称');
         if(empty($data['image'])) return Json::fail('请选择赛事图片，并且只能上传一张');
@@ -123,7 +120,7 @@ class Match extends AuthController
         if(!empty($count)) return Json::fail('赛事名称不能重复');
 
         $data['create_at'] = time();
-        $data['logo'] = $data['image'][0];
+        $data['logo'] = $data['image'];
         $data['province'] = $data['address'][0];
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
