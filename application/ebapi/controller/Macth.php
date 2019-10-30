@@ -679,5 +679,17 @@ class Macth extends AuthController
         return self::asJson($protocol,200,"获取成功");
     }
 
+    /**
+     * 我的资讯
+     */
+    public function myNew()
+    {
+        $article = Db::name("article")->field("id,title,image_input,add_time")->where(["uid"=>$this->uid])->select();
+        foreach ($article as $k=>$v){
+            $article[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+        }
+        return self::asJson($article,200,"获取成功");
+    }
+
 
 }
