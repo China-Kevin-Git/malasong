@@ -367,7 +367,7 @@ class Macth extends AuthController
             return self::asJson([],400,"参数错误");
         }
         Db::name("match_means")->insert($data);
-        Db::name("match_order")->where(['match_order_id'=>$data['match_order_id']])->update(["status"=>3]);
+        Db::name("match_order")->where(['match_order_sn'=>$data['match_order_sn']])->update(["status"=>3]);
         return self::asJson();
     }
 
