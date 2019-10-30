@@ -632,7 +632,6 @@ class Macth extends AuthController
         // 移动到框架应用根目录/public/uploads/ 目录下
         $info = $file->validate(['ext'=>'jpg,png,gif'])->move(ROOT_PATH . 'public' . DS . 'uploads');
         if($info){
-
             //获取图片的存放相对路径
             $filePath = 'public' . DS . 'uploads'. DS .$info->getSaveName();
             $getInfo = $info->getInfo();
@@ -641,6 +640,37 @@ class Macth extends AuthController
             // 上传失败获取错误信息
             echo $file->getError();
         }
+    }
+
+    /**
+     * 删除评论
+     */
+    public function delete()
+    {
+        $data = input("post.");
+        Db::name("article_comment")->where(["id"=>$data["id"]])->delete();
+        return self::asJson([],200,"删除成功");
+    }
+
+    /**
+     * 添加资讯
+     */
+    public function add()
+    {
+        $data = input("post.");
+        Db::name("article")->insert([
+            "cid"=>$data["cid"],
+            "title"=>$data["title"],
+            "author"=>"佚名",
+            "image_input"=>$data["image_input"],
+            "share_title"=>$data["title"],
+            "uid"=>$this->uid,
+            "add_time"=>time(),
+        ]);
+        $id = Db::name("article")->getLastInsID();
+
+        Db::name("article_content")->insert(["nid"=>$id,"content"=>$data["content"]]);
+        return self::asJson([],200,"添加成功");
     }
 
 

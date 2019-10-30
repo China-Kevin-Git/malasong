@@ -12,7 +12,7 @@ namespace app\ebapi\controller;
 use think\Controller;
 use think\Db;
 
-class Home extends Controller
+class Home extends AuthController
 {
     /**
      * 商城首页
