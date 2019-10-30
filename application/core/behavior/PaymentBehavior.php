@@ -72,6 +72,25 @@ class PaymentBehavior
             //处理业务逻辑
             if (stripos($orderId, 'match-') !== false){
                 $match_order =   Db::name("match_order")->where(["match_order_sn"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
+                $order = Db::name("match_order")->where(["match_order_sn"=>$orderId])->find();
+                $run_arr = Db::name("run_arr")->where(["uid"=>$order["uid"]])->value("run_id");
+                if(!empty($run_arr)){
+                    $run = Db::name("run")->where("id",$run_arr)->find();
+                    $price = round($order["order_price"]*$run["scale"]/100,2);
+                    Db::name("user")->where("uid",$run['uid'])->setInc("now_money",$price);
+                    Db::name("user_bill")->insert([
+                        "uid"=>$run['uid'],
+                        "link_id"=>$order['uid'],
+                        "pm"=>1,
+                        "title"=>"跑团人员购买赠送",
+                        "category"=>"now_money",
+                        "type"=>"recharge",
+                        "number"=>$price,
+                        "add_time"=>time(),
+                        "status"=>1,
+                    ]);
+                }
+
                 if($match_order){
                     return true;
                 }else{
@@ -81,6 +100,27 @@ class PaymentBehavior
             //处理业务逻辑
             if (stripos($orderId, 'pink-') !== false){
                 $match_order =   Db::name("match_pink")->where(["order_id"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
+
+                $order = Db::name("match_pink")->where(["order_id"=>$orderId])->find();
+                $run_arr = Db::name("run_arr")->where(["uid"=>$order["uid"]])->value("run_id");
+                if(!empty($run_arr)){
+                    $run = Db::name("run")->where("id",$run_arr)->find();
+                    $price = round($order["price"]*$run["scale"]/100,2);
+                    Db::name("user")->where("uid",$run['uid'])->setInc("now_money",$price);
+                    Db::name("user_bill")->insert([
+                        "uid"=>$run['uid'],
+                        "link_id"=>$order['uid'],
+                        "pm"=>1,
+                        "title"=>"跑团人员购买赠送",
+                        "category"=>"now_money",
+                        "type"=>"recharge",
+                        "number"=>$price,
+                        "add_time"=>time(),
+                        "status"=>1,
+                    ]);
+                }
+
+
                 if($match_order){
                     return true;
                 }else{

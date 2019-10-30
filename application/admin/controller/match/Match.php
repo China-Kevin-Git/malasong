@@ -48,11 +48,8 @@ class Match extends AuthController
     }
 
     /**
-
      * 添加分类管理
-
      * */
-
     public function create(){
         $f = array();
 

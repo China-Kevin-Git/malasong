@@ -337,6 +337,7 @@ class Macth extends AuthController
         }
         $order_price=$pricee+$meal_price+$match_goods_price;
         $order_price = round($order_price,2);
+        $order_price=0.01;
 
         $add=[
             "uid"=>$this->uid,
