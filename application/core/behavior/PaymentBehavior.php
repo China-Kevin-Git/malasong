@@ -87,6 +87,8 @@ class PaymentBehavior
                         "add_time"=>time(),
                         "stop_time"=>$combination["stop_time"],
                         "k_id"=>$order["k_id"],
+                        "is_pay"=>1,
+                        "pay_time"=>time(),
                     ];
                     Db::name("match_pink")->insert($array);
                 }
