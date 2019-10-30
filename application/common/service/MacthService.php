@@ -104,7 +104,10 @@ class MacthService extends Service
     public static function queryFollow($data)
     {
         if(isset($data['city']) && $data['city']){  //本地赛事
-            $follow = Db::table('eb_match')->where(['city' => $data['city']])->page(1,3)->order('create_at desc')->select();
+            $follow = Db::table('eb_match')
+                ->where(['city' => $data['city']])
+                ->page(1,3)
+                ->order('create_at desc')->select();
 
         }else if(isset($data['popular']) && $data['popular']){ //最热赛事
             $follow = Db::table('eb_match')->page(1,3)->order('num desc')->select();
