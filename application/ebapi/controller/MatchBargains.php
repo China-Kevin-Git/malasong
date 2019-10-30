@@ -312,4 +312,28 @@ class MatchBargains extends AuthController
         $pay = new AuthApi();
         $pay->pay_order($str);
     }
+
+
+    /**
+     * 砍价列表
+     */
+    public function BarLike()
+    {
+        $match_bargain_user = Db::name("match_bargain_user")->where(["uid"=>$this->uid])->select();
+        foreach ($match_bargain_user as $k=>$v){
+           $match_bargain =  Db::name("match_bargain")->where(["id"=>$v["bargain_id"]])->find();
+            $match_bargain_user[$k]["title"] =$match_bargain["title"];
+            $match_bargain_user[$k]["image"] =$match_bargain["image"];
+            $match_bargain_user[$k]["stop_time"] =date("Y-m-d",$match_bargain["stop_time"]);
+            if($v["status"]==1){
+                $match_bargain_user[$k]["name"] = "砍价中";
+            }elseif ($v["status"]==2){
+                $match_bargain_user[$k]["name"] = "活动结束参与失败";
+            }else{
+                $match_bargain_user[$k]["name"] = "3活动结束参与成功";
+            }
+        }
+        return JsonService::successful('ok',$match_bargain_user);
+    }
+
 }

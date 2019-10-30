@@ -291,15 +291,15 @@ class MatchPink extends AuthController
         $data = input("post.");
 
        $match_pink=Db::name("match_pink")
-            ->field("id,cid,add_time,total_price,stop_time,status,k_id")
+            ->field("id,cid,add_time,total_price,stop_time,status,k_id,pid")
             ->where(["uid"=>$this->uid])
             ->page($data["page"],$data["size"])
             ->select();
        foreach($match_pink as $k=>$v){
            $match_pink[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
            $match_pink[$k]["stop_time"] = date("Y-m-d H:i:s",$v["stop_time"]);
-           $match_pink[$k]["images"] = Db::name("match_combination")->where(["product_id"=>$v["cid"]])->value("image");
-           $match_pink[$k]["title"] = Db::name("match_combination")->where(["product_id"=>$v["cid"]])->value("title");
+           $match_pink[$k]["images"] = Db::name("match_combination")->where(["product_id"=>$v["pid"]])->value("image");
+           $match_pink[$k]["title"] = Db::name("match_combination")->where(["product_id"=>$v["pid"]])->value("title");
            if($v["status"]==1){
                $match_pink[$k]["status_name"] = "拼团中";
            }elseif($v["status"]==2){
