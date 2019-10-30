@@ -488,6 +488,7 @@ class Macth extends AuthController
             ->field("uid,content,add_time")
             ->where(["artilce_id"=>$data["artilce_id"]])
             ->order("add_time desc")
+            ->where(["type"=>1])
             ->page($data["page"],$data["size"])
             ->select();
         foreach ($comment as $k=>$v){
@@ -659,6 +660,7 @@ class Macth extends AuthController
             "cid"=>$data["cid"],
             "title"=>$data["title"],
             "author"=>"佚名",
+            "status"=>1,
             "image_input"=>$data["image_input"],
             "share_title"=>$data["title"],
             "uid"=>$this->uid,

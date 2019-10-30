@@ -49,7 +49,7 @@ class UserExtract extends ModelBasic
     public static function userExtract($userInfo,$data){
         if(!in_array($data['extract_type'],self::$extractType))
             return self::setErrorInfo('提现方式不存在');
-        if($data['extract_type']=='weixin') return self::setErrorInfo('微信提现暂时关闭！');
+//        if($data['extract_type']=='weixin') return self::setErrorInfo('微信提现暂时关闭！');
         $userInfo = User::get($userInfo['uid']);
         $brokerage = UserBill::getBrokerage($userInfo['uid']);//获取总佣金
         $extractTotalPrice = self::userExtractTotalPrice($userInfo['uid']);//累计提现
