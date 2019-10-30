@@ -117,6 +117,7 @@ class MatchPink extends AuthController
                 "add_time"=>time(),
                 "type"=>3,
                 "k_id"=>$data["tid"],
+                "match_name"=>Db::name("match")->where(["id"=>$combination["product_id"]])->value("match_name"),
             ];
         }
         Db::name("match_order")->insert($add);
