@@ -60,16 +60,34 @@ class MacthSeckil extends AuthController
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         $seckill = Db::name("match_seckill")->field("id,product_id,image,title,price,stop_time")->where(["id"=>$data["id"]])->find();
 
-        $add=[
-            "uid"=>$this->uid,
-            "match_id"=>$seckill["product_id"],
-            "order_price"=>$seckill["price"],
-            "match_order_sn"=>$str,
-            "add_time"=>time(),
-            "match_name"=>$seckill["title"],
-            "type"=>1,
-        ];
-        Db::name("match_order")->insert($add);
+        if($seckill["price"]==0){
+            $add=[
+                "uid"=>$this->uid,
+                "match_id"=>$seckill["product_id"],
+                "order_price"=>$seckill["price"],
+                "match_order_sn"=>$str,
+                "add_time"=>time(),
+                "match_name"=>$seckill["title"],
+                "type"=>1,
+                "is_pay"=>1,
+            ];
+            Db::name("match_order")->insert($add);
+            return JsonService::successful();
+        }else{
+            $add=[
+                "uid"=>$this->uid,
+                "match_id"=>$seckill["product_id"],
+                "order_price"=>$seckill["price"],
+                "match_order_sn"=>$str,
+                "add_time"=>time(),
+                "match_name"=>$seckill["title"],
+                "type"=>1,
+            ];
+            Db::name("match_order")->insert($add);
+            $pay = new AuthApi();
+            $pay->pay_order($str);
+        }
+
     }
 
 }

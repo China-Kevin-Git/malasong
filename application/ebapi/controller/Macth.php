@@ -363,7 +363,9 @@ class Macth extends AuthController
     public function means()
     {
         $data = input("post.");
-
+        if(empty($data['match_order_id'])){
+            return self::asJson([],400,"参数错误");
+        }
         Db::name("match_means")->insert($data);
         Db::name("match_order")->where(['match_order_id'=>$data['match_order_id']])->update(["status"=>3]);
         return self::asJson();
@@ -665,6 +667,15 @@ class Macth extends AuthController
 
         Db::name("article_content")->insert(["nid"=>$id,"content"=>$data["content"]]);
         return self::asJson([],200,"添加成功");
+    }
+
+    /**
+     * 用户协议
+     */
+    public function protocol()
+    {
+        $protocol = Db::name("protocol")->find();
+        return self::asJson($protocol,200,"添加成功");
     }
 
 

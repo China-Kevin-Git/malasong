@@ -259,7 +259,6 @@ class Match extends AuthController
     public function content($id){
         $data = input("post.");
         Db::name("match")->where(['id'=>$id])->update(["content"=>$data['content']]);
-
         return Json::successful('编辑成功!');
     }
 
