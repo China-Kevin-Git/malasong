@@ -119,6 +119,40 @@ class MatchOrder extends AuthController
         return $this->fetch('public/form-builder');
     }
 
+
+
+    /**
+
+     * 修改分类
+
+     * */
+
+    public function edit($id){
+        if(!$id) return $this->failed('参数错误');
+        $article = Db::name("match_order")->where('match_order_id',$id)->find();
+        if(!$article) return Json::fail('数据不存在!');
+        $f = array();
+        $f[] = Form::input('number','中签信息',$article["number"]);
+        $form = Form::make_post_form('编辑分类',$f,Url::build('update',array('id'=>$id)));
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
+
+    }
+
+    public function update(Request $request, $id)
+    {
+        $data = Util::postMore([
+            'number',
+           ],$request);
+
+        $match =Db::name("match_order")->where(["match_order_id"=>$id])->update($data);
+
+
+        if(!$match) return Json::fail('修改失败');
+        return Json::successful('修改成功!');
+    }
+
+
     /**
      * 删除分类
      * */
