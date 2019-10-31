@@ -116,7 +116,7 @@ class PaymentBehavior
                         "pm"=>1,
                         "title"=>"跑团人员购买赠送",
                         "category"=>"now_money",
-                        "type"=>"recharge",
+                        "type"=>"extract",
                         "number"=>$price,
                         "add_time"=>time(),
                         "status"=>1,
