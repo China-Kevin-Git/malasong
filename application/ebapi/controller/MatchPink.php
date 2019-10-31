@@ -61,7 +61,7 @@ class MatchPink extends AuthController
         $data['content'] = $match['content'];
         $data['address'] = $match['province'].$match['city'].$match['area'];
         $data['match_starat'] = date("Y-m-d",$match['match_starat']);
-
+        $data["enroll_time"] = $match["enroll_time"] * 1000;
         return JsonService::successful('ok',$data);
     }
 

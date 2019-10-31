@@ -45,7 +45,7 @@ class MacthSeckil extends AuthController
         $macth = Db::name("match")->where(["id"=>$seckill["product_id"]])->find();
         $seckill["address"] = $macth["province"].$macth["city"].$macth["area"];
         $seckill["match_starat"] = date("Y-m-d",$macth["match_starat"]);
-        $seckill["enroll_time"] = $macth["enroll_time"];
+        $seckill["enroll_time"] = $macth["enroll_time"] * 1000;
         $seckill["content"] = $macth["content"];
 
         return JsonService::successful($seckill);
