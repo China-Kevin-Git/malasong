@@ -406,6 +406,7 @@ class Macth extends AuthController
             ->field("match_order_id,match_id,order_price,is_pay,status,add_time,match_name,match_order_sn")
             ->where("uid", '=', $this->uid)
             ->where($where)
+            ->where("is_pay","<>",3)
             ->order("add_time desc")
             ->page($data["page"], 10)
             ->select();
@@ -726,6 +727,8 @@ class Macth extends AuthController
      */
     public function apply()
     {
+        $data = input("post.");
+        dump($this->uid);
 
     }
 
