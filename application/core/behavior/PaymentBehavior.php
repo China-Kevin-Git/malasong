@@ -95,7 +95,7 @@ class PaymentBehavior
                         $match_pink = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->find();
                         $count = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->count();
                         if($match_pink["people"] == $count){
-                            Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->update(["status"=>3]);
+                            Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->update(["status"=>2]);
                         }
 
                     }
@@ -109,6 +109,7 @@ class PaymentBehavior
                 if(!empty($run_arr)){
                     $run = Db::name("run")->where("id",$run_arr)->find();
                     $price = round($order["order_price"]*$run["scale"]/100,2);
+
                     Db::name("user")->where("uid",$run['uid'])->setInc("now_money",$price);
                     Db::name("user_bill")->insert([
                         "uid"=>$run['uid'],

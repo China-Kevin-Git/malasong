@@ -767,7 +767,7 @@ class Macth extends AuthController
         $user_money = Db::name("user")->where("uid",$this->uid)->value("now_money");
         $user["price_money"] = $user_money;
         //总收益
-        $user["now_money"] = $user_money + $user["price"];
+        $user["now_money"] =round($user_money + $user["price"],2);
         if($data["type"]==1){
             $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->where("pm",1)->where("type","extract")->order("add_time desc")->page($data["page"],10)->select();
         }elseif ($data["type"]==2){
