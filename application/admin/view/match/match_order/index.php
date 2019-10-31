@@ -77,7 +77,7 @@
                             </td>
 
                             <td class="text-center">
-                                <i class="fa {eq name='vo.status' value='2|3'}fa-check text-navy{else/}fa-close text-danger{/eq}"></i>
+                                <i class="fa {eq name='vo.status' value='0'}fa-check text-navy{/eq}{eq name='vo.status' value='1'}fa-check text-navy{/eq}{eq name='vo.status' value='3'}fa-close text-danger{/eq}{eq name='vo.status' value='2'}fa-close text-danger{/eq}"></i>
                             </td>
                             <td class="text-center">
                                 {$vo.red_name}
