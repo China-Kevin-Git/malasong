@@ -390,7 +390,7 @@ class Macth extends AuthController
         //type 1 全部 2 未支付  3 待完善 4 报名成功
 
         if ($data['type'] == 1) {
-            $where = "1=1";
+            $where = "is_pay <> 3 ";
         } elseif ($data['type'] == 2) {
             $where = ["is_pay" => 0];
         } elseif ($data['type'] == 3) {
@@ -403,7 +403,6 @@ class Macth extends AuthController
             ->field("match_order_id,match_id,order_price,is_pay,status,add_time,match_name,match_order_sn")
             ->where("uid", '=', $this->uid)
             ->where($where)
-            ->where("is_pay","<>",3)
             ->order("add_time desc")
             ->page($data["page"], 10)
             ->select();
@@ -765,11 +764,11 @@ class Macth extends AuthController
         //总收益
         $user["now_money"] = $user_money + $user["price"];
         if($data["type"]==1){
-            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->where("pm",1)->order("add_time desc")->page($data["page"],10)->select();
+            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->where("pm",1)->where("type","extract")->order("add_time desc")->page($data["page"],10)->select();
         }elseif ($data["type"]==2){
-            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->where("pm",0)->order("add_time desc")->page($data["page"],10)->select();
+            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->where("pm",0)->where("type","extract")->order("add_time desc")->page($data["page"],10)->select();
         }else{
-            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->order("add_time desc")->page($data["page"],10)->select();
+            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->order("add_time desc")->where("type","extract")->page($data["page"],10)->select();
         }
         foreach ($user["user_bill"] as $k=>$v){
             $user["user_bill"][$k]["add_time"] = date("Y-m-d",$v["add_time"]);

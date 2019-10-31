@@ -341,9 +341,9 @@ class MatchBargains extends AuthController
             if($v["status"]==1){
                 $match_bargain_user[$k]["name"] = "砍价中";
             }elseif ($v["status"]==2){
-                $match_bargain_user[$k]["name"] = "活动结束参与失败";
+                $match_bargain_user[$k]["name"] = "砍价失败";
             }else{
-                $match_bargain_user[$k]["name"] = "3活动结束参与成功";
+                $match_bargain_user[$k]["name"] = "砍价成功";
             }
         }
         return JsonService::successful('ok',$match_bargain_user);
