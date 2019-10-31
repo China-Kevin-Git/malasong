@@ -736,22 +736,18 @@ class Macth extends AuthController
         );
         //实例化 ChuanglanSmsApi 类
         $clapi  = new ChuanglanSmsApi();
-        //设置您要发送的内容：其中“【】”中括号为运营商签名符号，多签名内容前置添加提交
-        $result = $clapi->sendSMS($moblie,'【马拉松报名网】您好！开始报名：【马拉松报名网】xxxx赛事已经开始报名了 ，请前往小程序参与报名。
-【马拉松报名网】xxx赛事距离报名还剩7天，请尽快报名');
-        if(!is_null(json_decode($result))){
-            $output=json_decode($result,true);
-            if(isset($output['code'])  && $output['code']=='0'){
-                echo $result;
-            }else{
-                echo $output['errorMsg'];
-            }
-        }else{
-            echo $result;
+        $match = Db::name("match")->where(["id"=>$data["id"]])->find();
+        if($match["enroll_time"]<time()){
+            return self::asJson([], 400, "报名已截止");
         }
+        if($match["croll_time"]>time()){
+            return self::asJson([], 400, "报名未开始");
+        }
+        $time = ceil(($match["enroll_time"]- time())/(24*3600));
 
-
-//        http://smssh1.253.com/msg/send/{"account":"15286071110", "password":"520035mm", "msg":"【马拉松报名网】您的验证码是：2530", "phone":"15123398929", "sendtime":"'.time().'", "report":"true", "extend":"555", "uid":"1" }
+        //设置您要发送的内容：其中“【】”中括号为运营商签名符号，多签名内容前置添加提交
+//        $result = $clapi->sendSMS($moblie,'【马拉松报名网】您好！开始报名：'.$match["match_name"].'赛事已经开始报名了 ，请前往小程序参与报名。'.$match["match_name"].'赛事距离报名还剩'.$time.'天，请尽快报名');
+        return self::asJson([], 200, "提醒成功");
 
     }
 
