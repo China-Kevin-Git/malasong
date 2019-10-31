@@ -64,6 +64,7 @@ class Match extends AuthController
         $f[] = Form::input('match_name','赛事名字');
         //省市二级联动组件
         $f[] = Form::cityArea('address','比赛地址',[]);
+        $f[] = Form::input('add','详细地址');
         //日期区间选择组件
         $f[] = Form::dateRange(
             'limit_time',
@@ -109,6 +110,7 @@ class Match extends AuthController
             'match_catrgory_id',
             'content',
             'image',
+            'add',
             ['address',[]],
             ['limit_time',[]],
             ['enroll_times',[]],],$request);
@@ -125,6 +127,7 @@ class Match extends AuthController
         $data['province'] = $data['address'][0];
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
+        $data['address'] = $data['add'];
         $data['match_starat'] =strtotime($data['limit_time'][0]) ;
         $data['match_stop'] =strtotime($data['limit_time'][1]) ;
         $data['croll_time'] =strtotime($data['enroll_times'][0]);
@@ -167,6 +170,7 @@ class Match extends AuthController
         $f[] = Form::input('match_name','赛事名字',$article['match_name']);
         //省市二级联动组件
         $f[] = Form::cityArea('address','比赛地址',[$article['province'],$article['city'],$article['area']]);
+        $f[] = Form::input('add','详细地址',$article['address']);
         //日期区间选择组件
         $f[] = Form::dateRange(
             'limit_time',
@@ -196,6 +200,7 @@ class Match extends AuthController
             'match_name',
             'match_catrgory_id',
             'image',
+            'add',
             ['address',[]],
             ['limit_time',[]],
             ['enroll_times',[]]],$request);
@@ -214,6 +219,7 @@ class Match extends AuthController
         $data['province'] = $data['address'][0];
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
+        $data['address'] = $data['add'];
         $data['match_starat'] =strtotime($data['limit_time'][0]);
         $data['match_stop'] =strtotime($data['limit_time'][1]);
         $data['croll_time'] =strtotime($data['enroll_times'][0]);
