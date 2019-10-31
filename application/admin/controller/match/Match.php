@@ -72,10 +72,9 @@ class Match extends AuthController
             time()
         );
         //日期区间选择组件
-        $f[] = Form::date(
+        $f[] = Form::dateTime(
             'enroll_time',
-            '报名截止时间',
-            time()
+            '报名截止时间'
         );
         $f[] = Form::frameImageOne('image','赛事图片',Url::build('admin/widget.images/index',array('fodder'=>'image')))->icon('image');
         $form = Form::make_post_form('添加分类',$f,Url::build('save'));
@@ -169,14 +168,13 @@ class Match extends AuthController
         $f[] = Form::dateRange(
             'limit_time',
             '比赛区间日期',
-            strtotime('- 10 day'),
-            time()
+            $article['match_starat'],
+            $article['match_stop']
         );
         //日期区间选择组件
-        $f[] = Form::date(
+        $f[] = Form::dateTime(
             'enroll_time',
             '报名截止时间',
-            time(),
             $article['enroll_time']
         );
         $f[] = Form::frameImageOne('image','赛事图片',Url::build('admin/widget.images/index',array('fodder'=>'image')),$article['logo'])->icon('image');
