@@ -240,6 +240,7 @@ class Macth extends AuthController
         $id=input("post.id");
         $match=Db::name('match')->field("enroll_time,match_starat,match_name,province,city,area,logo")->where(['id'=>$id])->find();
         $match['match_starat']=date('Y-m-d',$match['match_starat']);
+        $match['enroll_time']=$match['enroll_time']*1000;
         $match["address"]=$match["province"].$match["city"].$match["area"];
         unset($match["province"]);
         unset($match["city"]);

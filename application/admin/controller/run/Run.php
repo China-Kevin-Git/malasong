@@ -138,6 +138,7 @@ class Run extends AuthController
         $f[] = Form::input('contacts','联系人',$product['contacts']);
         $f[] = Form::input('phone','联系电话',$product['phone']);
         $f[] = Form::input('scale','填写比例10-90',$product['scale']);
+        $f[] = Form::input('error_info','失败原因',$product['error_info']);
         $f[] = Form::radio('type','审核状态',$product['type'])->options([['label'=>'审核成功','value'=>1],['label'=>'待审核','value'=>0],['label'=>'审核失败','value'=>-1]])->col(12);
         $form = Form::make_post_form('添加用户通知',$f,Url::build('update',array('id'=>$id)));
         $this->assign(compact('form'));
@@ -158,6 +159,7 @@ class Run extends AuthController
             ['contacts',''],
             ['phone',''],
             ['scale',''],
+            ['error_info',''],
             ['type',0],
         ],$request);
         if($data['run_name'] == '') return JsonService::fail('请输入跑团名称');

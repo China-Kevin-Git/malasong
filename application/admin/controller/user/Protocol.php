@@ -11,8 +11,7 @@ namespace app\admin\controller\user;
 use app\admin\controller\AuthController;
 use app\admin\model\Match\MatchProduct;
 use service\JsonService;
-use service\UtilService as Util;
-use service\FormBuilder as Form;
+use think\Request;
 use service\UtilService;
 use think\Db;
 use traits\CurdControllerTrait;
@@ -21,6 +20,7 @@ use service\UploadService as Upload;
 use think\Url;
 use app\admin\model\umps\MatchBargain as MatchBargainModel;
 use app\admin\model\system\SystemAttachment;
+use service\FormBuilder as Form;
 
 //砍价
 class Protocol extends AuthController
@@ -41,6 +41,71 @@ class Protocol extends AuthController
         $this->assign("list",$data);
         return $this->fetch();
     }
+
+    /**
+     * 添加砍价
+     * @param  int  $id
+     * @return \think\Response
+     */
+    public function create()
+    {
+        $f = array();
+        $f[] = Form::input('title','名称');
+        $f[] = Form::radio('type','审核状态',1)->options([['label'=>'用户服务协议','value'=>1],['label'=>'隐私政策','value'=>2],['label'=>'其他','value'=>3]])->col(12);
+        $form = Form::make_post_form('添加用户通知',$f,Url::build('update'));
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
+    }
+
+
+    /**
+     * 保存更新的资源
+     *
+     * @param  \think\Request  $request
+     * @param  int  $id
+     * @return \think\Response
+     */
+    public function update(Request $request, $id='')
+    {
+        $data = UtilService::postMore([
+            ['title',''],
+            ['type',1],
+        ],$request);
+        if($data['title'] == '') return JsonService::fail('请输入名称');
+        if($id){
+            $product = Db::name("protocol")->where('id',$id)->find();
+            if(!$product) return Json::fail('数据不存在!');
+            $res = Db::name("protocol")->where("id",$id)->update($data);
+            if($res) return JsonService::successful('修改成功');
+            else return JsonService::fail('修改失败');
+        }else{
+            $res = Db::name("protocol")->insert($data);
+            if($res) return JsonService::successful('添加成功');
+            else return JsonService::fail('添加失败');
+        }
+
+
+    }
+
+    /**
+     * 显示编辑资源表单页.
+     *
+     * @param  int  $id
+     * @return \think\Response
+     */
+    public function edit($id)
+    {
+        if(!$id) return $this->failed('数据不存在');
+        $product = Db::name("protocol")->where('id',$id)->find();
+        if(!$product) return $this->failed('数据不存在!');
+        $f = array();
+        $f[] = Form::input('title','名称',$product['title']);
+        $f[] = Form::radio('type','审核状态',$product['type'])->options([['label'=>'用户服务协议','value'=>1],['label'=>'隐私政策','value'=>2],['label'=>'其他','value'=>3]])->col(12);
+        $form = Form::make_post_form('添加用户通知',$f,Url::build('update',array('id'=>$id)));
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
+    }
+
 
 
     /**
