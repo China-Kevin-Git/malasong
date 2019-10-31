@@ -91,6 +91,17 @@ class PaymentBehavior
                         "pay_time"=>time(),
                     ];
                     Db::name("match_pink")->insert($array);
+                    if(!empty($order["k_id"])){
+                        $match_pink = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->find();
+                        $count = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->count();
+                        if($match_pink["people"] == $count){
+                            Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->update(["status"=>3]);
+                        }
+
+                    }
+
+
+
                 }
 
                 $run_arr = Db::name("run_arr")->where(["uid"=>$order["uid"]])->value("run_id");
