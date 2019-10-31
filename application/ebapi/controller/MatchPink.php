@@ -77,6 +77,7 @@ class MatchPink extends AuthController
             $count = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>$v["uid"]])->page($data["page"],$data["size"])->count();
             $people = $v["people"]-$count;
             if($people == 0){
+                unset($match_pink["userPink"][$k]);
                 $num += 1;
                 continue;
             }
