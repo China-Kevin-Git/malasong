@@ -91,6 +91,16 @@ class MatchPink extends AuthController
     {
         $data = input("post.");
         $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["id"=>$data["id"]])->find();
+
+        $time = Db::name("match")->where(['id'=>$combination["product_id"]])->find();
+        if($time["croll_time"]>time()){
+            return self::asJson([],400,'赛事还没有开始报名');
+        }
+        if($time["enroll_time"]<time()){
+            return self::asJson([],400,'赛事已经结束报名');
+        }
+
+
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         if($data["type"]==1){
             $add=[

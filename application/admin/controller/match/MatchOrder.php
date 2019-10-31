@@ -62,11 +62,9 @@ class MatchOrder extends AuthController
             }else{
                 $match_order[$k]["meal_name"] = Db::name("match_meal")->where(["meal_id"=>$v["meal_id"]])->value("title");
             }
-
-            if($v["service_id"]===0){
+            if(empty($v["service_id"])){
                 $match_order[$k]["service_name"] = "无";
             }else{
-
                 $service_id = json_decode($v["service_id"],true);
                 foreach ($service_id as $j=>$i){
                     $service_id[$j] = $i["goods_name"].":".$i["price"] ."元 X ".$i["num"]."件";

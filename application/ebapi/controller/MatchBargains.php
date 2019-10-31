@@ -289,6 +289,9 @@ class MatchBargains extends AuthController
     public function bargains_order()
     {
         $data = input("post.");
+
+
+
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         $match=MatchBargainUser::setBargainUserStatus($data["bargainId"], $this->userInfo['uid']); //修改砍价状态StoreBargainUser::setBargainUserStatus($bargainId, $this->userInfo['uid']); //修改砍价状态
         if($match ===false){
@@ -296,6 +299,15 @@ class MatchBargains extends AuthController
         }
 
         $seckill = Db::name("match_bargain")->field("id,product_id,image,title,price,stop_time,min_price")->where(["id"=>$data["bargainId"]])->find();
+
+        $time = Db::name("match")->where(['id'=>$seckill["product_id"]])->find();
+        if($time["croll_time"]>time()){
+            return self::asJson([],400,'赛事还没有开始报名');
+        }
+        if($time["enroll_time"]<time()){
+            return self::asJson([],400,'赛事已经结束报名');
+        }
+
         $price = $seckill["min_price"];
         $add=[
             "uid"=>$this->uid,
