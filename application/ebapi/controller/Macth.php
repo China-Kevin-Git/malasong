@@ -237,7 +237,7 @@ class Macth extends AuthController
     public function details()
     {
         $id = input("post.id");
-        $match = Db::name('match')->field("enroll_time,match_starat,match_name,province,city,area,logo,croll_time")->where(['id' => $id])->find();
+        $match = Db::name('match')->field("enroll_time,match_starat,match_name,province,city,area,logo,croll_time,address")->where(['id' => $id])->find();
         $match_attention = Db::name("match_attention")->where("match_id",$id)->count();
         if(empty($match_attention)){
             $match['is_new'] = 0;
@@ -248,7 +248,7 @@ class Macth extends AuthController
         $match['match_starat'] = date('Y-m-d', $match['match_starat']);
         $match['enroll_time'] = $match['enroll_time'] * 1000;
         $match['croll_time'] = $match['croll_time'] * 1000;
-        $match["address"] = $match["province"] . $match["city"] . $match["area"];
+        $match["address"] = $match["province"] . $match["city"] . $match["area"].$match["address"];
         unset($match["province"]);
         unset($match["city"]);
         unset($match["area"]);

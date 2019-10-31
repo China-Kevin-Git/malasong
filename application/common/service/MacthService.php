@@ -158,6 +158,11 @@ class MacthService extends Service
         ){
             return self::set_err([],'1','缺少相关参数数据');
         }
+
+        if(empty($data['comment'])){
+            return self::set_err([],'1','内容不能为空');
+        }
+
         $comment = new comment();
         $comment->match_id = $data['match_id'];
         $comment->user_id = $data['user_id']??"0";
