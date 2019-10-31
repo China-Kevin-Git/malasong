@@ -290,14 +290,7 @@ class MatchBargains extends AuthController
     {
         $data = input("post.");
 
-
-
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
-        $match=MatchBargainUser::setBargainUserStatus($data["bargainId"], $this->userInfo['uid']); //修改砍价状态StoreBargainUser::setBargainUserStatus($bargainId, $this->userInfo['uid']); //修改砍价状态
-        if($match ===false){
-            JsonService::fail('砍价未成功，请重试');
-        }
-
         $seckill = Db::name("match_bargain")->field("id,product_id,image,title,price,stop_time,min_price")->where(["id"=>$data["bargainId"]])->find();
 
         $time = Db::name("match")->where(['id'=>$seckill["product_id"]])->find();
