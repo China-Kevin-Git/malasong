@@ -757,10 +757,7 @@ class Macth extends AuthController
 
         //可提现的
         $user_money = Db::name("user")->where("uid",$this->uid)->value("now_money");
-        $user["price_money"] = $user_money - $user["price"];
-        if($user["price_money"]<0){
-            $user["price_money"]=0;
-        }
+        $user["price_money"] = $user_money;
         //总收益
         $user["now_money"] = $user_money + $user["price"];
         if($data["type"]==1){
