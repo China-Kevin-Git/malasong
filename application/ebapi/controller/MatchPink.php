@@ -122,7 +122,7 @@ class MatchPink extends AuthController
             $add=[
                 "uid"=>$this->uid,
                 "match_id"=>$combination["product_id"],
-                "order_price"=>$data["amount"],
+                "order_price"=>$combination["price"],
                 "match_order_sn"=>$str,
                 "add_time"=>time(),
                 "type"=>3,
