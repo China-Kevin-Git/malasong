@@ -111,9 +111,10 @@ class PaymentBehavior
                     ]);
                 }
                 if($match_order){
+                    //阻止微信接口反复回调接口
+                    $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                    echo $str;
                     return true;
-                }else{
-                    return false;
                 }
             }
 
