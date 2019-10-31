@@ -178,17 +178,16 @@ class Macth extends AuthController
             if ($data['value'] == 1) {
                 $where = "1=1";
             }
-
         } elseif ($data['type'] == 2) {
+            $date = explode('/', $data['value']);
 
-            $date = explode('-', $data['value']);
             $star_time = date("Y-m-d H:i:s", mktime(0, 0, 0, (float)$date[1], (float)$date[2], (float)$date[0]));
             $end_time = date("Y-m-d H:i:s", mktime(0, 0, 0, (float)$date[1], (float)$date[2] + 1, (float)$date[0]));
             $time["star"] = strtotime($star_time);
             $time["end"] = strtotime($end_time);
-            $where = "a.match_starat BETWEEN " . $time["star"] . " AND " . $time["end"];
+            $where = "match_starat BETWEEN " . $time["star"] . " AND " . $time["end"];
         } elseif ($data['type'] == 3) {
-            $where = ['a.province' => $data['value']];
+            $where = ['province' => $data['value']];
         } else {
             $where = "1=1";
         }
@@ -196,19 +195,16 @@ class Macth extends AuthController
         if (empty($data['order_type'])) {
             $data['order_type'] = 0;
         }
-
         if ($data['order_type'] == 2) {
-            $order = "b.follow_num desc";
+            $order = "num desc";
         } elseif ($data['order_type'] == 3) {
-            $order = "a.enroll_time";
+            $order = "enroll_time";
         } else {
-            $order = "a.match_starat";
+            $where = " and enroll_time >".time()." and croll_time <".time();
         }
 
         $match = Db::name('match')
-            ->field('a.id,a.match_name,a.province,a.city,a.match_starat,a.logo,b.follow_num')
-            ->alias('a')
-            ->join('match_follow b', 'a.id=b.match_id')
+            ->field('id,match_name,province,city,match_starat,logo,num as follow_num')
             ->where($where)
             ->order($order)
             ->page($data['page'], 10)
@@ -746,8 +742,39 @@ class Macth extends AuthController
         $time = ceil(($match["enroll_time"]- time())/(24*3600));
 
         //设置您要发送的内容：其中“【】”中括号为运营商签名符号，多签名内容前置添加提交
-//        $result = $clapi->sendSMS($moblie,'【马拉松报名网】您好！开始报名：'.$match["match_name"].'赛事已经开始报名了 ，请前往小程序参与报名。'.$match["match_name"].'赛事距离报名还剩'.$time.'天，请尽快报名');
+        $result = $clapi->sendSMS($moblie,'【马拉松报名网】您好！开始报名：'.$match["match_name"].'赛事已经开始报名了 ，请前往小程序参与报名。'.$match["match_name"].'赛事距离报名还剩'.$time.'天，请尽快报名');
         return self::asJson([], 200, "提醒成功");
+
+    }
+
+    /**
+     * 錢包
+     */
+    public function qian()
+    {
+        $data = input("post.");
+        //已提现的
+        $user["price"] = Db::name("user_bill")->where("uid",$this->uid)->where("type","extract")->where('status',1)->sum("number");
+
+        //可提现的
+        $user_money = Db::name("user")->where("uid",$this->uid)->value("now_money");
+        $user["price_money"] = $user_money - $user["price"];
+        if($user["price_money"]<0){
+            $user["price_money"]=0;
+        }
+        //总收益
+        $user["now_money"] = $user_money + $user["price"];
+        if($data["type"]==1){
+            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->where("pm",1)->order("add_time desc")->page($data["page"],10)->select();
+        }elseif ($data["type"]==2){
+            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->where("pm",0)->order("add_time desc")->page($data["page"],10)->select();
+        }else{
+            $user["user_bill"] =  Db::name("user_bill")->where("uid",$this->uid)->order("add_time desc")->page($data["page"],10)->select();
+        }
+        foreach ($user["user_bill"] as $k=>$v){
+            $user["user_bill"][$k]["add_time"] = date("Y-m-d",$v["add_time"]);
+        }
+        return self::asJson($user, 200, "获取成功");
 
     }
 
