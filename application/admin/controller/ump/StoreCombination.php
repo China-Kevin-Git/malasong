@@ -156,6 +156,7 @@ class StoreCombination extends AuthController
             'sort',
             'stock',
             'sales',
+            'unit_name',
             ['is_show',0],
             ['is_host',0],
             ['is_postage',0],

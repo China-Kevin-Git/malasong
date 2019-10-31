@@ -674,11 +674,21 @@ class Macth extends AuthController
     }
 
     /**
-     * 用户协议
+     * 用户协议列表
      */
     public function protocol()
     {
-        $protocol = Db::name("protocol")->find();
+        $protocol = Db::name("protocol")->select();
+        return self::asJson($protocol,200,"获取成功");
+    }
+
+    /**
+     * 用户协议
+     */
+    public function protocols()
+    {
+        $data = input("post.");
+        $protocol = Db::name("protocol")->where(["id"=>$data["id"]])->find();
         return self::asJson($protocol,200,"获取成功");
     }
 
