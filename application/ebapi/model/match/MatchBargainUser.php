@@ -167,7 +167,7 @@ class MatchBargainUser extends ModelBasic
         $userPrice = (float)self::where('id',$bargainUserTableId)->where('status',1)->value('price');
         $price = self::getBargainUserDiffPriceFloat($bargainUserTableId);//TODO 用户可以砍掉的金额  下订单
         if(bcsub($price,$userPrice,2) > 0) return false;
-        return self::where('id',$bargainUserTableId)->where('status',1)->update(['status'=>3]);
+      //  return self::where('id',$bargainUserTableId)->where('status',1)->update(['status'=>3]);
     }
 
     /**
