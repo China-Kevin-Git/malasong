@@ -92,10 +92,12 @@ class Run extends AuthController
         $data = input("get.id");
         if(empty($data)){
             $run = Db::name("run")->where(["uid"=>$this->uid])->find();
+            $run["qrcode"] = $this->qrCode();
         }else{
             $run = Db::name("run")->where(["id"=>$data])->find();
+            $run["qrcode"] = $this->qrCode();
         }
-        $run["qrcode"] = $this->qrCode();
+
         return JsonService::successful('获取成功',$run);
 
     }
