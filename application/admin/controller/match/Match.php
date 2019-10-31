@@ -132,7 +132,6 @@ class Match extends AuthController
         $data['match_stop'] =strtotime($data['limit_time'][1]) ;
         $data['croll_time'] =strtotime($data['enroll_times'][0]);
         $data['enroll_time'] =strtotime($data['enroll_times'][1]);
-        unset($data['address']);
         unset($data['limit_time']);
         unset($data['image']);
         $data['match'] =json_encode($data);
@@ -225,7 +224,6 @@ class Match extends AuthController
         $data['croll_time'] =strtotime($data['enroll_times'][0]);
         $data['enroll_time'] =strtotime($data['enroll_times'][1]);
 
-        unset($data['address']);
         unset($data['limit_time']);
         unset($data['image']);
 
