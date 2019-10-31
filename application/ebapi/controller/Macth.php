@@ -3,6 +3,7 @@
 namespace app\ebapi\controller;
 
 use app\common\service\MacthService;
+use chuanglan\demo\API\ChuanglanSmsHelper\ChuanglanSmsApi;
 use think\Db;
 use think\Request;
 
@@ -728,7 +729,29 @@ class Macth extends AuthController
     public function apply()
     {
         $data = input("post.");
-        dump($this->uid);
+        $moblie = Db::name("user")->where(["uid"=>$this->uid])->value("phone");
+        //设置编码格式为utf-8;json格式统一使用utf-8封装
+        header(
+            "Content-type:text/html; charset=UTF-8"
+        );
+        //实例化 ChuanglanSmsApi 类
+        $clapi  = new ChuanglanSmsApi();
+        //设置您要发送的内容：其中“【】”中括号为运营商签名符号，多签名内容前置添加提交
+        $result = $clapi->sendSMS($moblie,'【马拉松报名网】您好！开始报名：【马拉松报名网】xxxx赛事已经开始报名了 ，请前往小程序参与报名。
+【马拉松报名网】xxx赛事距离报名还剩7天，请尽快报名');
+        if(!is_null(json_decode($result))){
+            $output=json_decode($result,true);
+            if(isset($output['code'])  && $output['code']=='0'){
+                echo $result;
+            }else{
+                echo $output['errorMsg'];
+            }
+        }else{
+            echo $result;
+        }
+
+
+//        http://smssh1.253.com/msg/send/{"account":"15286071110", "password":"520035mm", "msg":"【马拉松报名网】您的验证码是：2530", "phone":"15123398929", "sendtime":"'.time().'", "report":"true", "extend":"555", "uid":"1" }
 
     }
 
