@@ -100,8 +100,9 @@ class PaymentBehavior
 
                     }
 
-
-
+                }
+                if($order["type"]==2){
+                    Db::name("match_bargain_user")->where('id',$order["k_id"])->update(["status"=>3]);
                 }
 
                 $run_arr = Db::name("run_arr")->where(["uid"=>$order["uid"]])->value("run_id");

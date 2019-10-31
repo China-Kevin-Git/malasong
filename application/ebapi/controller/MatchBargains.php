@@ -319,6 +319,7 @@ class MatchBargains extends AuthController
             "type"=>2,
             "pay_time"=>time(),
             "status"=>1,
+            "k_id"=>$seckill["id"],
         ];
         Db::name("match_order")->insert($add);
         $pay = new AuthApi();
