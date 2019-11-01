@@ -97,7 +97,12 @@ class PaymentBehavior
                         if($match_pink["people"] == $count+1){
                             Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->update(["status"=>2]);
                         }
-
+                    }
+                    if($match_order){
+                        //阻止微信接口反复回调接口
+                        $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        echo $str;
+                        return true;
                     }
 
                 }
