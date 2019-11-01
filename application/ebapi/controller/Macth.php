@@ -370,8 +370,9 @@ class Macth extends AuthController
             "address_id" => $data["address_id"],
         ];
         Db::name("match_order")->insert($add);
-
-        return self::asJson($str);
+        $array["match_order_id"] = Db::name("match_order")->getLastInsID();
+        $array["match_order_sn"] = $str;
+        return self::asJson($array);
     }
 
     /**
