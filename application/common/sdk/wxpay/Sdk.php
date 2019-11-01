@@ -26,15 +26,15 @@ class Sdk
         $ip = \think\Request::instance();
         $url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/promotion/transfers';
         $request = new DepositRefundRequest($config);
-        $request->setMchAppid($data['mch_appid']??'wx73f6fda2165a0899');//申请商户号的appid或商户号绑定的appid
+        $request->setMchAppid($data['mch_appid']??'wx8d0ed4c58830b0ab');//申请商户号的appid或商户号绑定的appid
 //        $request->setDeviceInfo($data['device_info']);//微信支付分配的终端设备号
         $request->setMchId($data['mchid']??'1491810082');//微信支付分配的商户号
         $request->setNonceStr(self::getNonceStr());//随机字符串
         $request->setSubAppid($data['partner_trade_no']??self::getNonceStr());//商户订单号，需保持唯一性(只能是字母或者数字，不能包含有其他字符)
-        $request->setOpenid($data['openid']);//商户appid下，某用户的openid
+        $request->setOpenid("oNMkS0ZcFQptN26Z0zkz0lBYdxfk");//商户appid下，某用户的openid
         $request->setCheckName($data['check_name']??"NO_CHECK");//NO_CHECK：不校验真实姓名,FORCE_CHECK：强校验真实姓名
         $request->setUserName($data['user_name']??"某**");//收款用户真实姓名。如果check_name设置为FORCE_CHECK，则必填用户真实姓名
-        $request->setAmount($data['amount']??"10");//企业付款金额，单位为分
+        $request->setAmount($data['amount']??"1");//企业付款金额，单位为分
         $request->setDesc($data['desc']??"理赔");//企业付款备注，必填。注意：备注中的敏感词会被转成字符*
         $request->setIp($data['spbill_create_ip']??$ip->ip());//该IP同在商户平台设置的IP白名单中的IP没有关联，该IP可传用户端或者服务端的IP
 
@@ -96,9 +96,9 @@ class Sdk
         if ($useCret) {
             $file_path = dirname(__FILE__);
             curl_setopt($ch,CURLOPT_SSLCERTTYPE,'PEM');
-            curl_setopt($ch,CURLOPT_SSLCERT, $file_path.'/tenant/apiclient_cert.pem');
+            curl_setopt($ch,CURLOPT_SSLCERT, $file_path.'/tenant/61000001/apiclient_cert.pem');
             curl_setopt($ch,CURLOPT_SSLKEYTYPE,'PEM');
-            curl_setopt($ch,CURLOPT_SSLKEY, $file_path.'/tenant/apiclient_key.pem');
+            curl_setopt($ch,CURLOPT_SSLKEY, $file_path.'/tenant/61000001/apiclient_key.pem');
         }
         //设置header
         curl_setopt($ch, CURLOPT_HEADER, FALSE);
@@ -110,7 +110,10 @@ class Sdk
         curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
         //运行curl
         $data = curl_exec($ch);
+//        "/public/uploads/config/file/5d9ca5ac061d7.pem"
+//        "/public/uploads/config/file/5d9ca5b076b41.pem"
         //返回结果
+        dump($data);
         if ($data) {
             curl_close($ch);
             return $data;
@@ -120,7 +123,8 @@ class Sdk
             curl_close($ch);
             //网络请求失败 记录下超时日志，方便后期维护查看
             $msg = "curl出错 [{$url}]，错误码:{$error}，错误信息：{$error_info}";
-
+            dump($error);
+            dump($error_info);exit;
             //CURL 错误 统一码 408
             throw new \Exception("curl请求错误", 408);
 //            throw new WxPayException("curl出错，错误码:{$error}，错误信息：{$error_info}");

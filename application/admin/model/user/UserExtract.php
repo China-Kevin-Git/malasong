@@ -88,7 +88,8 @@ class UserExtract extends ModelBasic
         $trans['amount'] = $extract_number * 10 * 10;
         $sdk = new Sdk();
         $config['key'] = '6hrMKxuH4krDM3qDzhrBoHWrbNe1aQfN';
-        $sdk->transfers($trans,$config);
+
+        dump($sdk->transfers($trans,$config));exit;
         return self::edit(compact('status'),$id);
     }
     //测试数据
