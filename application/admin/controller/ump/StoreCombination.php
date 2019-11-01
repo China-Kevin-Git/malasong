@@ -87,7 +87,7 @@ class StoreCombination extends AuthController
         $f[] = Form::frameImageOne('image','产品主图片(305*305px)',Url::build('admin/widget.images/index',array('fodder'=>'image')),$product->getData('image'))->icon('image');
         $f[] = Form::frameImages('images','产品轮播图(640*640px)',Url::build('admin/widget.images/index',array('fodder'=>'images')),json_decode($product->getData('slider_image')))->maxLength(5)->icon('images');
         $f[] = Form::number('price','拼团价')->min(0)->col(12);
-        $f[] = Form::number('people','拼团人数')->min(3)->col(12);
+        $f[] = Form::number('people','拼团人数')->col(12);
         $f[] = Form::number('stock','库存',$product->getData('stock'))->min(0)->precision(0)->col(12);
         $f[] = Form::number('sales','销量',$product->getData('sales'))->min(0)->precision(0)->col(12);
         $f[] = Form::number('sort','排序')->col(12);
@@ -122,7 +122,7 @@ class StoreCombination extends AuthController
         $f[] = Form::frameImageOne('image','产品主图片(305*305px)',Url::build('admin/widget.images/index',array('fodder'=>'image')))->icon('image');
         $f[] = Form::frameImages('images','产品轮播图(640*640px)',Url::build('admin/widget.images/index',array('fodder'=>'images')))->maxLength(5)->icon('images');
         $f[] = Form::number('price','拼团价')->min(0)->col(12);
-        $f[] = Form::number('people','拼团人数')->min(3)->col(12);
+        $f[] = Form::number('people','拼团人数')->col(12);
         $f[] = Form::number('stock','库存')->min(0)->precision(0)->col(12);
         $f[] = Form::number('sales','销量')->min(0)->precision(0)->col(12);
         $f[] = Form::number('sort','排序')->col(12);
@@ -156,6 +156,7 @@ class StoreCombination extends AuthController
             'sort',
             'stock',
             'sales',
+            'unit_name',
             ['is_show',0],
             ['is_host',0],
             ['is_postage',0],

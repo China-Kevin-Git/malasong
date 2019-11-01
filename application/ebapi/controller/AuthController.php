@@ -14,7 +14,7 @@ class AuthController extends Basic
         "querymatch",
         "queryfollow",
         "article",
-        "allMacth",
+        "allmacth",
         "macthcatgory",
         "details",
         "detailscontent",
@@ -24,10 +24,11 @@ class AuthController extends Basic
         "homeindex",
         "crfy",
         "get_combination_list",
-        "homeIndex",
         "get_article",
         "get_cid_article",
         "article_desc",
+        "homeIndex",
+        "home_index",
 
     ];
 

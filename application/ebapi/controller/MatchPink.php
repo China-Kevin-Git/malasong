@@ -61,7 +61,7 @@ class MatchPink extends AuthController
         $data['content'] = $match['content'];
         $data['address'] = $match['province'].$match['city'].$match['area'];
         $data['match_starat'] = date("Y-m-d",$match['match_starat']);
-
+        $data["enroll_time"] = $match["enroll_time"] * 1000;
         return JsonService::successful('ok',$data);
     }
 
@@ -72,15 +72,25 @@ class MatchPink extends AuthController
     {
         $data = input("post.");
         $match_pink["userPink"] = Db::name("match_pink")->field("uid,people")->where(["cid"=>$data["id"],"k_id"=>0])->page($data["page"],$data["size"])->select();
+        $num = 0 ;
         foreach ($match_pink["userPink"] as $k=>$v){
+            $count = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>$v["uid"]])->page($data["page"],$data["size"])->count();
+            $people = $v["people"]-$count-1;
+            if($people == 0){
+                unset($match_pink["userPink"][$k]);
+                $num += 1;
+                continue;
+            }
+            $match_pink["userPink"][$k]["num"] = $people-1;
+
+
             $user = Db::name("user")->where(["uid"=>$v["uid"]])->find();
             $match_pink["userPink"][$k]["nickname"] = $user["nickname"];
             $match_pink["userPink"][$k]["avatar"] = $user["avatar"];
-            $count = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>$v["uid"]])->page($data["page"],$data["size"])->count();
-            $match_pink["userPink"][$k]["num"] = $v["people"]-$count;
-        }
 
-        $match_pink["pinkNum"] = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>0])->count();
+        }
+        $match_pink["userPink"] = array_values($match_pink["userPink"]);
+        $match_pink["pinkNum"] = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>0])->where("status",1)->count()-$num;
         return JsonService::successful('ok',$match_pink);
     }
 
@@ -91,6 +101,16 @@ class MatchPink extends AuthController
     {
         $data = input("post.");
         $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["id"=>$data["id"]])->find();
+
+        $time = Db::name("match")->where(['id'=>$combination["product_id"]])->find();
+        if($time["croll_time"]>time()){
+            return self::asJson([],400,'赛事还没有开始报名');
+        }
+        if($time["enroll_time"]<time()){
+            return self::asJson([],400,'赛事已经结束报名');
+        }
+
+
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         if($data["type"]==1){
             $add=[
@@ -102,7 +122,7 @@ class MatchPink extends AuthController
                 "match_name"=>Db::name("match")->where(["id"=>$combination["product_id"]])->value("match_name"),
             ];
         }elseif($data["type"]==2){
-            $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"cid"=>$combination["product_id"],"status"=>1])->count();
+            $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"cid"=>$combination["id"],"status"=>1])->count();
             if(!empty($count)){
                 return JsonService::fail('该赛事您已经在拼团了');
             }
@@ -112,11 +132,12 @@ class MatchPink extends AuthController
             $add=[
                 "uid"=>$this->uid,
                 "match_id"=>$combination["product_id"],
-                "order_price"=>$data["amount"],
+                "order_price"=>$combination["price"],
                 "match_order_sn"=>$str,
                 "add_time"=>time(),
                 "type"=>3,
                 "k_id"=>$data["tid"],
+                "h_id"=>$combination["id"],
                 "match_name"=>Db::name("match")->where(["id"=>$combination["product_id"]])->value("match_name"),
             ];
         }

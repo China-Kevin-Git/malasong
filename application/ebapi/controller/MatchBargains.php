@@ -289,13 +289,18 @@ class MatchBargains extends AuthController
     public function bargains_order()
     {
         $data = input("post.");
+
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
-        $match=MatchBargainUser::setBargainUserStatus($data["bargainId"], $this->userInfo['uid']); //修改砍价状态StoreBargainUser::setBargainUserStatus($bargainId, $this->userInfo['uid']); //修改砍价状态
-        if($match ===false){
-            JsonService::fail('砍价未成功，请重试');
+        $seckill = Db::name("match_bargain")->field("id,product_id,image,title,price,stop_time,min_price")->where(["id"=>$data["bargainId"]])->find();
+
+        $time = Db::name("match")->where(['id'=>$seckill["product_id"]])->find();
+        if($time["croll_time"]>time()){
+            return self::asJson([],400,'赛事还没有开始报名');
+        }
+        if($time["enroll_time"]<time()){
+            return self::asJson([],400,'赛事已经结束报名');
         }
 
-        $seckill = Db::name("match_bargain")->field("id,product_id,image,title,price,stop_time,min_price")->where(["id"=>$data["bargainId"]])->find();
         $price = $seckill["min_price"];
         $add=[
             "uid"=>$this->uid,
@@ -307,6 +312,7 @@ class MatchBargains extends AuthController
             "type"=>2,
             "pay_time"=>time(),
             "status"=>1,
+            "k_id"=>$seckill["id"],
         ];
         Db::name("match_order")->insert($add);
         $pay = new AuthApi();
@@ -328,9 +334,9 @@ class MatchBargains extends AuthController
             if($v["status"]==1){
                 $match_bargain_user[$k]["name"] = "砍价中";
             }elseif ($v["status"]==2){
-                $match_bargain_user[$k]["name"] = "活动结束参与失败";
+                $match_bargain_user[$k]["name"] = "砍价失败";
             }else{
-                $match_bargain_user[$k]["name"] = "3活动结束参与成功";
+                $match_bargain_user[$k]["name"] = "砍价成功";
             }
         }
         return JsonService::successful('ok',$match_bargain_user);

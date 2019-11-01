@@ -45,7 +45,7 @@ class MacthSeckil extends AuthController
         $macth = Db::name("match")->where(["id"=>$seckill["product_id"]])->find();
         $seckill["address"] = $macth["province"].$macth["city"].$macth["area"];
         $seckill["match_starat"] = date("Y-m-d",$macth["match_starat"]);
-        $seckill["enroll_time"] = $macth["enroll_time"];
+        $seckill["enroll_time"] = $macth["enroll_time"] * 1000;
         $seckill["content"] = $macth["content"];
 
         return JsonService::successful($seckill);
@@ -57,6 +57,15 @@ class MacthSeckil extends AuthController
     public function seckill_order()
     {
         $data = input("post.");
+        $time = Db::name("match")->where(['id'=>$data['id']])->find();
+        if($time["croll_time"]>time()){
+            return self::asJson([],400,'赛事还没有开始报名');
+        }
+        if($time["enroll_time"]<time()){
+            return self::asJson([],400,'赛事已经结束报名');
+        }
+
+
         $str = "match-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
         $seckill = Db::name("match_seckill")->field("id,product_id,image,title,price,stop_time")->where(["product_id"=>$data["id"]])->find();
         if($seckill["price"]==0){

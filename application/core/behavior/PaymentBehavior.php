@@ -72,10 +72,16 @@ class PaymentBehavior
             //处理业务逻辑
             if (stripos($orderId, 'match-') !== false){
                 $match_order =   Db::name("match_order")->where(["match_order_sn"=>$orderId])->update(["is_pay"=>1,"status"=>1,"pay_time"=>time()]);
+
                 $order = Db::name("match_order")->where(["match_order_sn"=>$orderId])->find();
+                if(!empty($order["service_id"])){
+                    Db::name("store_order")->where(["order_id"=>$orderId])->update(["pay_type"=>"weixin","pay_time"=>time(),'paid'=>1]);
+                }
+
+
                 if($order["type"]==3){
                     $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
-                    $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["product_id"=>$order["match_id"]])->find();
+                    $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["id"=>$order["h_id"]])->find();
                     $array = [
                         "uid"=>$order["uid"],
                         "order_id"=>$str,
@@ -91,12 +97,30 @@ class PaymentBehavior
                         "pay_time"=>time(),
                     ];
                     Db::name("match_pink")->insert($array);
+                    if(!empty($order["k_id"])){
+                        $match_pink = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->find();
+                        $count = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->count();
+                        if($match_pink["people"] == $count+1){
+                            Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->update(["status"=>2]);
+                        }
+                    }
+                    if($match_order){
+                        //阻止微信接口反复回调接口
+                        $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                        echo $str;
+                        return true;
+                    }
+
+                }
+                if($order["type"]==2){
+                    Db::name("match_bargain_user")->where('bargain_id',$order["k_id"])->where('uid',$order["uid"])->update(["status"=>3]);
                 }
 
                 $run_arr = Db::name("run_arr")->where(["uid"=>$order["uid"]])->value("run_id");
                 if(!empty($run_arr)){
                     $run = Db::name("run")->where("id",$run_arr)->find();
                     $price = round($order["order_price"]*$run["scale"]/100,2);
+
                     Db::name("user")->where("uid",$run['uid'])->setInc("now_money",$price);
                     Db::name("user_bill")->insert([
                         "uid"=>$run['uid'],
@@ -104,16 +128,17 @@ class PaymentBehavior
                         "pm"=>1,
                         "title"=>"跑团人员购买赠送",
                         "category"=>"now_money",
-                        "type"=>"recharge",
+                        "type"=>"extract",
                         "number"=>$price,
                         "add_time"=>time(),
                         "status"=>1,
                     ]);
                 }
                 if($match_order){
+                    //阻止微信接口反复回调接口
+                    $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                    echo $str;
                     return true;
-                }else{
-                    return false;
                 }
             }
 

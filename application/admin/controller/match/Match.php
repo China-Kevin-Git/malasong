@@ -64,17 +64,18 @@ class Match extends AuthController
         $f[] = Form::input('match_name','赛事名字');
         //省市二级联动组件
         $f[] = Form::cityArea('address','比赛地址',[]);
+        $f[] = Form::input('add','详细地址');
         //日期区间选择组件
-        $f[] = Form::dateRange(
+        $f[] = Form::dateTime(
             'limit_time',
             '比赛区间日期',
-            strtotime('- 10 day'),
             time()
         );
         //日期区间选择组件
-        $f[] = Form::date(
-            'enroll_time',
-            '报名截止时间',
+        $f[] = Form::dateTimeRange(
+            'enroll_times',
+            '报名区间时间',
+            strtotime('- 10 day'),
             time()
         );
         $f[] = Form::frameImageOne('image','赛事图片',Url::build('admin/widget.images/index',array('fodder'=>'image')))->icon('image');
@@ -108,9 +109,10 @@ class Match extends AuthController
             'match_catrgory_id',
             'content',
             'image',
+            'add',
             ['address',[]],
             ['limit_time',[]],
-            'enroll_time',],$request);
+            ['enroll_times',[]],],$request);
         if(!$data['match_name']) return Json::fail('请输入赛事名称');
         if(!$data['match_catrgory_id']) return Json::fail('请输入赛分类名称');
         if(empty($data['image'])) return Json::fail('请选择赛事图片，并且只能上传一张');
@@ -124,10 +126,11 @@ class Match extends AuthController
         $data['province'] = $data['address'][0];
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
-        $data['match_starat'] =strtotime($data['limit_time'][0]) ;
-        $data['match_stop'] =strtotime($data['limit_time'][1]) ;
-        $data['enroll_time'] =strtotime($data['enroll_time']);
-        unset($data['address']);
+        $data['address'] = $data['add'];
+        $data['match_starat'] =strtotime($data['limit_time']) ;
+        $data['match_stop'] =strtotime($data['limit_time']) ;
+        $data['croll_time'] =strtotime($data['enroll_times'][0]);
+        $data['enroll_time'] =strtotime($data['enroll_times'][1]);
         unset($data['limit_time']);
         unset($data['image']);
         $data['match'] =json_encode($data);
@@ -165,18 +168,18 @@ class Match extends AuthController
         $f[] = Form::input('match_name','赛事名字',$article['match_name']);
         //省市二级联动组件
         $f[] = Form::cityArea('address','比赛地址',[$article['province'],$article['city'],$article['area']]);
+        $f[] = Form::input('add','详细地址',$article['address']);
         //日期区间选择组件
-        $f[] = Form::dateRange(
+        $f[] = Form::dateTime(
             'limit_time',
-            '比赛区间日期',
-            strtotime('- 10 day'),
-            time()
+            '比赛日期',
+            $article['match_starat']
         );
         //日期区间选择组件
-        $f[] = Form::date(
-            'enroll_time',
-            '报名截止时间',
-            time(),
+        $f[] = Form::dateTimeRange(
+            'enroll_times',
+            '报名区间时间',
+            $article['croll_time'],
             $article['enroll_time']
         );
         $f[] = Form::frameImageOne('image','赛事图片',Url::build('admin/widget.images/index',array('fodder'=>'image')),$article['logo'])->icon('image');
@@ -192,9 +195,10 @@ class Match extends AuthController
             'match_name',
             'match_catrgory_id',
             'image',
+            'add',
             ['address',[]],
-            ['limit_time',[]],
-            'enroll_time',],$request);
+            'limit_time',
+            ['enroll_times',[]]],$request);
         if(!$data['match_name']) return Json::fail('请输入赛事名称');
         if(!$data['match_catrgory_id']) return Json::fail('请输入赛分类名称');
         if(empty($data['image'])) return Json::fail('请选择赛事图片，并且只能上传一张');
@@ -210,11 +214,12 @@ class Match extends AuthController
         $data['province'] = $data['address'][0];
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
-        $data['match_starat'] =strtotime($data['limit_time'][0]);
-        $data['match_stop'] =strtotime($data['limit_time'][1]);
-        $data['enroll_time'] =strtotime($data['enroll_time']);
+        $data['address'] = $data['add'];
+        $data['match_starat'] =strtotime($data['limit_time']);
+        $data['match_stop'] =strtotime($data['limit_time']);
+        $data['croll_time'] =strtotime($data['enroll_times'][0]);
+        $data['enroll_time'] =strtotime($data['enroll_times'][1]);
 
-        unset($data['address']);
         unset($data['limit_time']);
         unset($data['image']);
 

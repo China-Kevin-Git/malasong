@@ -62,11 +62,9 @@ class MatchOrder extends AuthController
             }else{
                 $match_order[$k]["meal_name"] = Db::name("match_meal")->where(["meal_id"=>$v["meal_id"]])->value("title");
             }
-
-            if($v["service_id"]===0){
+            if(empty($v["service_id"])){
                 $match_order[$k]["service_name"] = "无";
             }else{
-
                 $service_id = json_decode($v["service_id"],true);
                 foreach ($service_id as $j=>$i){
                     $service_id[$j] = $i["goods_name"].":".$i["price"] ."元 X ".$i["num"]."件";
@@ -120,6 +118,40 @@ class MatchOrder extends AuthController
         $this->assign(compact('form'));
         return $this->fetch('public/form-builder');
     }
+
+
+
+    /**
+
+     * 修改分类
+
+     * */
+
+    public function edit($id){
+        if(!$id) return $this->failed('参数错误');
+        $article = Db::name("match_order")->where('match_order_id',$id)->find();
+        if(!$article) return Json::fail('数据不存在!');
+        $f = array();
+        $f[] = Form::input('number','中签信息',$article["number"]);
+        $form = Form::make_post_form('编辑分类',$f,Url::build('update',array('id'=>$id)));
+        $this->assign(compact('form'));
+        return $this->fetch('public/form-builder');
+
+    }
+
+    public function update(Request $request, $id)
+    {
+        $data = Util::postMore([
+            'number',
+           ],$request);
+
+        $match =Db::name("match_order")->where(["match_order_id"=>$id])->update($data);
+
+
+        if(!$match) return Json::fail('修改失败');
+        return Json::successful('修改成功!');
+    }
+
 
     /**
      * 删除分类

@@ -77,7 +77,7 @@
                             </td>
 
                             <td class="text-center">
-                                <i class="fa {eq name='vo.status' value='2|3'}fa-check text-navy{else/}fa-close text-danger{/eq}"></i>
+                                <i class="fa {eq name='vo.status' value='2'}fa-check text-navy{/eq}{eq name='vo.status' value='3'}fa-check text-navy{/eq}{eq name='vo.status' value='0'}fa-close text-danger{/eq}{eq name='vo.status' value='1'}fa-close text-danger{/eq}"></i>
                             </td>
                             <td class="text-center">
                                 {$vo.red_name}
@@ -93,7 +93,8 @@
                             </td>
 
                             <td class="text-center">
-                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('查看资料','{:Url('means',array('id'=>$vo['match_order_id']))}')"><i class="fa fa-paste"></i> 编辑</button>
+                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('查看资料','{:Url('means',array('id'=>$vo['match_order_id']))}')"><i class="fa fa-paste"></i> 查看资料</button>
+                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('查看资料','{:Url('edit',array('id'=>$vo['match_order_id']))}')"><i class="fa fa-paste"></i> 中签信息</button>
                                 <button class="btn btn-warning btn-xs del_config_tab" data-id="{$vo.match_order_id}" type="button" data-url="{:Url('delete',array('id'=>$vo['match_order_id']))}" ><i class="fa fa-warning"></i> 删除</button>
                             </td>
                         </tr>

@@ -7,7 +7,7 @@
         <div class="ibox float-e-margins">
 
             <div class="ibox-title">
-
+                    <button type="button" class="btn btn-w-m btn-primary add-filed">添加赛事</button>
             </div>
             <div class="ibox-content">
 
@@ -44,6 +44,7 @@
 
                             </td>
                             <td class="text-center">
+                                <button class="btn btn-info btn-xs" type="button"  onclick="$eb.createModalFrame('编辑','{:Url('edit',array('id'=>$vo['id']))}')"><i class="fa fa-paste"></i> 编辑</button>
                                 <a type="button" class="btn btn-info btn-xs"  onclick="$eb.createModalFrame(this.innerText,'{:Url('edit_content')}?id={$vo['id']}')"> <i class="fa fa-paste"></i> 详情</a>
                             </td>
 

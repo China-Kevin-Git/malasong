@@ -105,7 +105,7 @@ class MacthService extends Service
     {
         if(isset($data['city']) && $data['city']){  //本地赛事
             $follow = Db::table('eb_match')
-                ->where(['city' => $data['city']])
+                ->where(['province' => $data['city']])
                 ->page(1,3)
                 ->order('create_at desc')->select();
 
@@ -158,6 +158,11 @@ class MacthService extends Service
         ){
             return self::set_err([],'1','缺少相关参数数据');
         }
+
+        if(empty($data['comment'])){
+            return self::set_err([],'1','内容不能为空');
+        }
+
         $comment = new comment();
         $comment->match_id = $data['match_id'];
         $comment->user_id = $data['user_id']??"0";
