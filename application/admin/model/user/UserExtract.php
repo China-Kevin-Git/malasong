@@ -11,6 +11,8 @@ namespace app\admin\model\user;
 use app\admin\model\user\User;
 use app\admin\model\user\UserBill;
 use app\admin\model\wechat\WechatUser;
+use app\common\sdk\wxpay\Sdk;
+use think\Db;
 use think\Url;
 use traits\ModelTrait;
 use basic\ModelBasic;
@@ -68,7 +70,7 @@ class UserExtract extends ModelBasic
     {
         $status = 1;
         $data =self::get($id);
-        $extract_number=$data['extract_price'];
+        $extract_number = $data['extract_price'];
         $mark='成功提现佣金'.$extract_number.'元';
         $uid=$data['uid'];
         $User= User::find(['uid'=>$uid])->toArray();
@@ -81,6 +83,12 @@ class UserExtract extends ModelBasic
                 'remark' => '点击查看我的佣金明细'
             ], Url::build('wap/my/user_pro', [], true, true));
         }
+        //企业打款
+        $trans['openid'] = Db::name("wechat_user")->where('uid',$uid)->value("routine_openid");
+        $trans['amount'] = $extract_number * 10 * 10;
+        $sdk = new Sdk();
+        $config['key'] = '6hrMKxuH4krDM3qDzhrBoHWrbNe1aQfN';
+        $sdk->transfers($trans,$config);
         return self::edit(compact('status'),$id);
     }
     //测试数据
