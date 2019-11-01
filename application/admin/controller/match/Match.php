@@ -66,10 +66,9 @@ class Match extends AuthController
         $f[] = Form::cityArea('address','比赛地址',[]);
         $f[] = Form::input('add','详细地址');
         //日期区间选择组件
-        $f[] = Form::dateRange(
+        $f[] = Form::dateTime(
             'limit_time',
             '比赛区间日期',
-            strtotime('- 10 day'),
             time()
         );
         //日期区间选择组件
@@ -128,8 +127,8 @@ class Match extends AuthController
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
         $data['address'] = $data['add'];
-        $data['match_starat'] =strtotime($data['limit_time'][0]) ;
-        $data['match_stop'] =strtotime($data['limit_time'][1]) ;
+        $data['match_starat'] =strtotime($data['limit_time']) ;
+        $data['match_stop'] =strtotime($data['limit_time']) ;
         $data['croll_time'] =strtotime($data['enroll_times'][0]);
         $data['enroll_time'] =strtotime($data['enroll_times'][1]);
         unset($data['limit_time']);
@@ -171,13 +170,10 @@ class Match extends AuthController
         $f[] = Form::cityArea('address','比赛地址',[$article['province'],$article['city'],$article['area']]);
         $f[] = Form::input('add','详细地址',$article['address']);
         //日期区间选择组件
-        $f[] = Form::dateRange(
+        $f[] = Form::dateTime(
             'limit_time',
-            '比赛区间日期',
-            strtotime('- 10 day'),
-            time(),
-            $article['match_starat'],
-            $article['match_stop']
+            '比赛日期',
+            $article['match_starat']
         );
         //日期区间选择组件
         $f[] = Form::dateTimeRange(
@@ -201,7 +197,7 @@ class Match extends AuthController
             'image',
             'add',
             ['address',[]],
-            ['limit_time',[]],
+            'limit_time',
             ['enroll_times',[]]],$request);
         if(!$data['match_name']) return Json::fail('请输入赛事名称');
         if(!$data['match_catrgory_id']) return Json::fail('请输入赛分类名称');
@@ -219,8 +215,8 @@ class Match extends AuthController
         $data['city'] = $data['address'][1];
         $data['area'] = $data['address'][2];
         $data['address'] = $data['add'];
-        $data['match_starat'] =strtotime($data['limit_time'][0]);
-        $data['match_stop'] =strtotime($data['limit_time'][1]);
+        $data['match_starat'] =strtotime($data['limit_time']);
+        $data['match_stop'] =strtotime($data['limit_time']);
         $data['croll_time'] =strtotime($data['enroll_times'][0]);
         $data['enroll_time'] =strtotime($data['enroll_times'][1]);
 
