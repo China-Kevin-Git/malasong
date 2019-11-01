@@ -27,6 +27,7 @@ class AuthController extends Basic
         "get_article",
         "get_cid_article",
         "article_desc",
+        "homeIndex",
 
     ];
 

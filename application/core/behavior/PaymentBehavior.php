@@ -94,7 +94,7 @@ class PaymentBehavior
                     if(!empty($order["k_id"])){
                         $match_pink = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->find();
                         $count = Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->count();
-                        if($match_pink["people"] == $count){
+                        if($match_pink["people"] == $count+1){
                             Db::name("match_pink")->where(["k_id"=>$order["k_id"]])->update(["status"=>2]);
                         }
 
