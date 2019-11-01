@@ -101,7 +101,7 @@ class ArticleApi extends AuthController
     public function article_desc()
     {
         $data=input("post.");
-        $data = Db::name("article")->field("id as article_id,title,image_input,add_time")->where(["hide"=>0,"cid"=>$data["cid"]])->order("add_time desc")->limit($data['page'],10)->select();
+        $data = Db::name("article")->field("id as article_id,title,image_input,add_time")->where(["hide"=>0,"cid"=>$data["cid"]])->order("add_time desc")->page($data['page'],10)->select();
         foreach ($data as $k=>$v){
             $data[$k]["add_time"] = date("Y-m-d",$v["add_time"]);
         }
