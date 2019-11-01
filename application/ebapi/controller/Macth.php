@@ -385,7 +385,7 @@ class Macth extends AuthController
             return self::asJson([], 400, "参数错误");
         }
         if (stripos($data['match_order_id'], 'match-') !== false){
-            $data['match_order_id'] = Db::name("match_order")->where(["match_order_sn",$data['match_order_id']])->value("match_order_sn");
+            $data['match_order_id'] = Db::name("match_order")->where(["match_order_sn",$data['match_order_id']])->value("match_order_id");
         }
 
         $data["user_id"] = $this->uid;
