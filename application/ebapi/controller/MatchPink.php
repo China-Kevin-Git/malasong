@@ -75,13 +75,15 @@ class MatchPink extends AuthController
         $num = 0 ;
         foreach ($match_pink["userPink"] as $k=>$v){
             $count = Db::name("match_pink")->where(["cid"=>$data["id"],"k_id"=>$v["uid"]])->page($data["page"],$data["size"])->count();
-            $people = $v["people"]-$count;
+            $people = $v["people"]-$count-1;
             if($people == 0){
                 unset($match_pink["userPink"][$k]);
                 $num += 1;
                 continue;
             }
             $match_pink["userPink"][$k]["num"] = $people-1;
+
+
             $user = Db::name("user")->where(["uid"=>$v["uid"]])->find();
             $match_pink["userPink"][$k]["nickname"] = $user["nickname"];
             $match_pink["userPink"][$k]["avatar"] = $user["avatar"];
@@ -120,7 +122,7 @@ class MatchPink extends AuthController
                 "match_name"=>Db::name("match")->where(["id"=>$combination["product_id"]])->value("match_name"),
             ];
         }elseif($data["type"]==2){
-            $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"cid"=>$combination["product_id"],"status"=>1])->count();
+            $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"pid"=>$combination["product_id"],"status"=>1])->count();
             if(!empty($count)){
                 return JsonService::fail('该赛事您已经在拼团了');
             }
