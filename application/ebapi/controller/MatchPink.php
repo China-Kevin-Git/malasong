@@ -122,7 +122,7 @@ class MatchPink extends AuthController
                 "match_name"=>Db::name("match")->where(["id"=>$combination["product_id"]])->value("match_name"),
             ];
         }elseif($data["type"]==2){
-            $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"pid"=>$combination["product_id"],"status"=>1])->count();
+            $count =  Db::name("match_pink")->where(["uid"=>$this->uid,"cid"=>$combination["id"],"status"=>1])->count();
             if(!empty($count)){
                 return JsonService::fail('该赛事您已经在拼团了');
             }
