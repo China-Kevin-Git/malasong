@@ -37,7 +37,7 @@ class MatchPink extends AuthController
             $store_combination["combination"][$k]['start_time'] = date("Y-m-d",$v['start_time']);
         }
         $store_combination["banner"]=[
-          "http://chinb.org/public/system/images/20191012003902.png"
+          "https://malasong.eastemperor.com/public/system/images/20191012003902.png"
         ];
         return JsonService::successful('ok',$store_combination);
     }
