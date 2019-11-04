@@ -659,7 +659,7 @@ class Macth extends AuthController
             return self::asJson($data, 200, "获取成功");
         }
         foreach ($match_attention as $k => $v) {
-            $data[$k] = Db::name("article")->field("id,title,image_input,add_time")->where("id", $v["article_id"])->find();
+            $data[$k] = Db::name("article")->field("id,title,image_input,add_time")->where("id", $v["article_id"])->where(["hide"=>0,"status"=>1])->find();
             $data[$k]["add_time"] = date("Y-m-d", $data[$k]["add_time"]);
         }
         return self::asJson($data, 200, "获取成功");
