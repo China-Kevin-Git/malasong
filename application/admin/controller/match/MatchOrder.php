@@ -41,15 +41,14 @@ class MatchOrder extends AuthController
         if($params['keyword'] == ''){
             $where = "1=1";
         }else{
-            $where= 'match_order_sn  LIKE  % '.$params["keyword"].' % ';
+            $where= "a.match_order_sn  LIKE  '%".$params["keyword"]."%' ";
         }
-
         $match_order= Db::name("match_order")
             ->alias('a')
             ->join('user r','r.uid=a.uid','LEFT')
             ->field('a.*,r.nickname')
-            ->order('a.match_order_id DESC')
             ->where($where)
+            ->order('a.match_order_id DESC')
             ->select();
         foreach ($match_order as $k=>$v){
             if($v["red_id"]==0){

@@ -174,7 +174,7 @@ class Macth extends AuthController
             $data['type'] = 0;
         }
         if ($data['type'] == 1) {
-            $where = " a.match_catrgory_id=" . $data['value'];
+            $where = " match_catrgory_id=" . $data['value'];
             if ($data['value'] == 1) {
                 $where = "1=1";
             }
@@ -307,9 +307,9 @@ class Macth extends AuthController
      */
     public function search()
     {
-        $data = input("post");
+        $data = input("post.");
 
-        $match = Db::name("match")->field("id,match_name")->whereLike("match_name", "%" . $data['keyword'] . "%")->select();
+        $match = Db::name("match")->field("id,match_name")->whereLike("match_name", "%".$data['keyword']."%")->select();
 
         return self::asJson($match);
     }
