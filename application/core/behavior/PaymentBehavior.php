@@ -78,7 +78,6 @@ class PaymentBehavior
                     Db::name("store_order")->where(["order_id"=>$orderId])->update(["pay_type"=>"weixin","pay_time"=>time(),'paid'=>1]);
                 }
 
-
                 if($order["type"]==3){
                     $str = "pink-".date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
                     $combination = Db::name("match_combination")->field("id,product_id,people,price,stop_time")->where(["id"=>$order["h_id"]])->find();
@@ -134,6 +133,19 @@ class PaymentBehavior
                         "status"=>1,
                     ]);
                 }
+                //赛事消费明细
+                $bill = [
+                    "uid"=>$order["uid"],
+                    "link_id"=>$order["uid"],
+                    "pm"=>0,
+                    "title"=>"赛事报名消费",
+                    "category"=>"integral",
+                    "type"=>"extract",
+                    "number"=>$order["order_price"],
+                    "add_time"=>time(),
+                    "status"=>1,
+                ];
+                Db::name("user_bill")->insert($bill);
                 if($match_order){
                     //阻止微信接口反复回调接口
                     $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
