@@ -2,6 +2,8 @@
 namespace app\ebapi\controller;
 
 
+use think\Db;
+
 class AuthController extends Basic
 {
     protected $uid = 0;
@@ -36,6 +38,16 @@ class AuthController extends Basic
     {
 
         parent::_initialize();
+
+        $prom_goods = Db::name('match_order')->where(["is_pay"=>0])->field('match_order_id,add_time')->limit(100)->select();
+        foreach ($prom_goods as &$v){
+            if($v['add_time']+1800<=time()){
+                //取消
+                Db::name('match_order')->where('match_order_id',$v['match_order_id'])->update(["is_pay"=>3]);
+            }
+        }
+
+
         if(in_array(request()->action(),$this->action)==false){
             //验证TOken并获取user信息
             $this->userInfo=$this->checkTokenGetUserInfo();
