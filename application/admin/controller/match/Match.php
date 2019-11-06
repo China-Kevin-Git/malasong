@@ -111,7 +111,7 @@ class Match extends AuthController
             'image',
             'add',
             ['address',[]],
-            ['limit_time',[]],
+            'limit_time',
             ['enroll_times',[]],],$request);
         if(!$data['match_name']) return Json::fail('请输入赛事名称');
         if(!$data['match_catrgory_id']) return Json::fail('请输入赛分类名称');
@@ -230,7 +230,7 @@ class Match extends AuthController
         $match_follow['city'] = $data['city'];
         $match_follow['area'] = $data['area'];
         $match_follow['create_at'] = time();
-         Db::name("match_follow")->where(["match_id"=>$id])->update($match_follow);
+        Db::name("match_follow")->where(["match_id"=>$id])->update($match_follow);
 
         if(!$match) return Json::fail('修改失败');
         return Json::successful('修改成功!');
