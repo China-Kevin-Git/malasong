@@ -931,7 +931,18 @@ class Macth extends AuthController
      */
     public function area()
     {
-
+        $data = input("post.");
+        //type :1 国家 2省  3市 4区
+        if($data["type"] == 1){
+            $country =  Db::name("country")->field("id,country as name")->where(["parentid"=>0])->select();
+        }elseif($data["type"] == 2){
+            $country =  Db::name("country")->field("id,state as name")->where(["parentid"=>$data["parentid"]])->select();
+        }elseif($data["type"] == 3){
+            $country =  Db::name("country")->field("id,city as name")->where(["parentid"=>$data["parentid"]])->select();
+        }elseif($data["type"] == 4){
+            $country =  Db::name("country")->field("id,region as name")->where(["parentid"=>$data["parentid"]])->select();
+        }
+        return self::asJson($country, 200, "获取成功");
     }
 
 
