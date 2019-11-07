@@ -450,15 +450,10 @@ class Macth extends AuthController
     public function mean()
     {
         $data = input("post.");
-        //正则表达式
-        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["mobile"]);
-        if ($mobiles == 0) {
-            return self::asJson([], 400, "请输入手机格式");
-        }
-        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["emergency_mobile"]);
-        if ($mobiles == 0) {
-            return self::asJson([], 400, "请输入手机格式");
-        }
+        $data["nationality"] = Db::name("country")->where(["id"=>$data["nationality"]])->value("country");
+        $data["residence"] = Db::name("country")->where(["id"=>$data["residence"]])->value("state");
+        $data["city"] = Db::name("country")->where(["id"=>$data["city"]])->value("city");
+
         if ($data["emergency_mobile"] == $data["mobile"]) {
             return self::asJson([], 400, "紧急联系人电话不能与联系人电话一致");
         }
@@ -491,15 +486,10 @@ class Macth extends AuthController
     public function meanEdit()
     {
         $data = input("post.");
-        //正则表达式
-        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["mobile"]);
-        if ($mobiles == 0) {
-            return self::asJson([], 400, "请输入手机格式");
-        }
-        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["emergency_mobile"]);
-        if ($mobiles == 0) {
-            return self::asJson([], 400, "请输入手机格式");
-        }
+        $data["nationality"] = Db::name("country")->where(["id"=>$data["nationality"]])->value("country");
+        $data["residence"] = Db::name("country")->where(["id"=>$data["residence"]])->value("state");
+        $data["city"] = Db::name("country")->where(["id"=>$data["city"]])->value("city");
+
         if ($data["emergency_mobile"] == $data["mobile"]) {
             return self::asJson([], 400, "紧急联系人电话不能与联系人电话一致");
         }
@@ -530,6 +520,17 @@ class Macth extends AuthController
     {
         $data = input("post.");
          Db::name("match_mean")->where(["mean_id"=>$data["mean_id"]])->delete();
+        return self::asJson();
+    }
+
+    /**
+     * 我的完善资料信息
+     */
+    public function info()
+    {
+        $data = input("post.");
+        $data["user_id"] = $this->uid;
+        Db::name("match_means")->insert($data);
         return self::asJson();
     }
 

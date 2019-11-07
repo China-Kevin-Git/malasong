@@ -87,6 +87,10 @@ class ArticleApi extends AuthController
     {
 
         $article = Db::name("article")->where(["is_banner"=>1])->order("add_time desc")->limit(0,3)->select();
+        if(empty($article)){
+            $data["banner"][0]["img"] = "https://malasong.eastemperor.com/public/system/images/20191012003902.png";
+            $data["banner"][0]["url"] = "";
+        }
         foreach ($article as $k=>$v){
             $data["banner"][$k]["img"] = $v["image_input"];
             $data["banner"][$k]["url"] = $v["url"];
