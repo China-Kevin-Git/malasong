@@ -200,7 +200,7 @@ class Macth extends AuthController
         } elseif ($data['order_type'] == 3) {
             $order = "enroll_time";
         } else {
-            $where = " and enroll_time >".time()." and croll_time <".time();
+            $where = " and enroll_time >" . time() . " and croll_time <" . time();
         }
 
         $match = Db::name('match')
@@ -238,17 +238,17 @@ class Macth extends AuthController
     {
         $id = input("post.id");
         $match = Db::name('match')->field("enroll_time,match_starat,match_name,province,city,area,logo,croll_time,address")->where(['id' => $id])->find();
-        $match_attention = Db::name("match_attention")->where("match_id",$id)->count();
-        if(empty($match_attention)){
+        $match_attention = Db::name("match_attention")->where("match_id", $id)->count();
+        if (empty($match_attention)) {
             $match['is_new'] = 0;
-        }else{
+        } else {
             $match['is_new'] = 1;
         }
 
         $match['match_starat'] = date('Y-m-d', $match['match_starat']);
         $match['enroll_time'] = $match['enroll_time'] * 1000;
         $match['croll_time'] = $match['croll_time'] * 1000;
-        $match["address"] = $match["province"] . $match["city"] . $match["area"].$match["address"];
+        $match["address"] = $match["province"] . $match["city"] . $match["area"] . $match["address"];
         unset($match["province"]);
         unset($match["city"]);
         unset($match["area"]);
@@ -309,7 +309,7 @@ class Macth extends AuthController
     {
         $data = input("post.");
 
-        $match = Db::name("match")->field("id,match_name")->whereLike("match_name", "%".$data['keyword']."%")->select();
+        $match = Db::name("match")->field("id,match_name")->whereLike("match_name", "%" . $data['keyword'] . "%")->select();
 
         return self::asJson($match);
     }
@@ -346,58 +346,57 @@ class Macth extends AuthController
         if (empty($data['service_id'])) {
             $data['service_id'] = 0;
         } else {
-            $num =0;
-            $cart_id =[];
+            $num = 0;
+            $cart_id = [];
             foreach ($data['service_id'] as $k => $v) {
                 $match_goods = Db::name("match_goods")->where(['service_id' => $v["service_id"]])->value("price");
                 $match_goods_price += $match_goods * $v["num"];
                 $num += $v["num"];
-                $cart_id[$k]= $v["service_id"];
+                $cart_id[$k] = $v["service_id"];
                 Db::name("match_order_goods")->insert(['match_order_sn' => $str, 'num' => $v["num"], 'price' => $match_goods * $v["num"], 'add_time' => time(), 'service_id' => $v["service_id"]]);
-                $json[$k]=[
-                    "id"=>$v["service_id"],
-                    "uid"=>$this->uid,
-                    "type"=>"product",
-                    "product_id"=>$v["service_id"],
-                    "cart_num"=>$v["num"],
-                    "add_time"=>time(),
-                    "productInfo"=>[
-                        "image"=>$v["logo"],
-                        "price"=>$v["price"],
-                        "store_name"=>$v["goods_name"],
-                        "unit_name"=>"件",
+                $json[$k] = [
+                    "id" => $v["service_id"],
+                    "uid" => $this->uid,
+                    "type" => "product",
+                    "product_id" => $v["service_id"],
+                    "cart_num" => $v["num"],
+                    "add_time" => time(),
+                    "productInfo" => [
+                        "image" => $v["logo"],
+                        "price" => $v["price"],
+                        "store_name" => $v["goods_name"],
+                        "unit_name" => "件",
                     ],
-                    "truePrice"=>$v["price"],
+                    "truePrice" => $v["price"],
                 ];
             }
-            $user=Db::name('user')->where(['uid'=>$this->uid])->find();
-            $user_address=Db::name('user_address')->where(['uid'=>$this->uid])->find();
+            $user = Db::name('user')->where(['uid' => $this->uid])->find();
+            $user_address = Db::name('user_address')->where(['uid' => $this->uid])->find();
             $arrays = [
-                "order_id"=>$str,
-                "uid"=>$this->uid,
-                "real_name"=>$user["nickname"],
-                "user_phone"=>$user["phone"],
-                "user_address"=>$user_address["detail"],
-                "cart_id"=>json_encode($cart_id),
-                "total_num"=>$num,
-                "total_price"=>$match_goods_price,
-                "pay_price"=>$match_goods_price,
-                "pay_type"=>"weixin",
-                "add_time"=>time(),
-                "unique"=>md5(rand(1000000, 9999999)),
-                "is_channel"=>1,
+                "order_id" => $str,
+                "uid" => $this->uid,
+                "real_name" => $user["nickname"],
+                "user_phone" => $user["phone"],
+                "user_address" => $user_address["detail"],
+                "cart_id" => json_encode($cart_id),
+                "total_num" => $num,
+                "total_price" => $match_goods_price,
+                "pay_price" => $match_goods_price,
+                "pay_type" => "weixin",
+                "add_time" => time(),
+                "unique" => md5(rand(1000000, 9999999)),
+                "is_channel" => 1,
             ];
             Db::name("store_order")->insert($arrays);
             $store_order = Db::name("store_order")->getLastInsID();
-            foreach ($json as $k=>$v){
-                $store_order_cart_info= [
-                    "oid"=>$store_order,
-                    "cart_id"=>$v["id"],
-                    "product_id"=>$v["id"],
-                    "cart_info"=>json_encode($json[$k]),
-                    "unique"=>md5(rand(1000000, 9999999)),
-                ];
-                ;
+            foreach ($json as $k => $v) {
+                $store_order_cart_info = [
+                    "oid" => $store_order,
+                    "cart_id" => $v["id"],
+                    "product_id" => $v["id"],
+                    "cart_info" => json_encode($json[$k]),
+                    "unique" => md5(rand(1000000, 9999999)),
+                ];;
                 Db::name("store_order_cart_info")->insert($store_order_cart_info);
             }
 
@@ -430,17 +429,107 @@ class Macth extends AuthController
      */
     public function means()
     {
+
         $data = input("post.");
-        if (empty($data['match_order_id'])) {
+        if (empty($data['match_order_id']) && empty($data['mean_id'])) {
             return self::asJson([], 400, "参数错误");
         }
-        if (stripos($data['match_order_id'], 'match-') !== false){
-            $data['match_order_id'] = Db::name("match_order")->where(["match_order_sn",$data['match_order_id']])->value("match_order_id");
+        if (stripos($data['match_order_id'], 'match-') !== false) {
+            $data['match_order_id'] = Db::name("match_order")->where(["match_order_sn", $data['match_order_id']])->value("match_order_id");
         }
-
-        $data["user_id"] = $this->uid;
-        Db::name("match_means")->insert($data);
+        $mean = Db::name("match_mean")->where(["mean_id" => $data['mean_id']])->find();
+        $mean["match_order_id"] = $data['match_order_id'];
+        Db::name("match_means")->insert($mean);
         Db::name("match_order")->where(['match_order_id' => $data['match_order_id']])->update(["status" => 3]);
+        return self::asJson();
+    }
+
+    /**
+     * 我的完善资料
+     */
+    public function mean()
+    {
+        $data = input("post.");
+        //正则表达式
+        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["mobile"]);
+        if ($mobiles == 0) {
+            return self::asJson([], 400, "请输入手机格式");
+        }
+        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["emergency_mobile"]);
+        if ($mobiles == 0) {
+            return self::asJson([], 400, "请输入手机格式");
+        }
+        if ($data["emergency_mobile"] == $data["mobile"]) {
+            return self::asJson([], 400, "紧急联系人电话不能与联系人电话一致");
+        }
+        if (!empty($data["ccie"])) {
+            $data["ccie"] = json_encode($data["ccie"]);
+        }
+        $data["user_id"] = $this->uid;
+        Db::name("match_mean")->insert($data);
+        return self::asJson();
+    }
+
+    /**
+     * 我的完善资料列表
+     */
+    public function meanList()
+    {
+        $data = input("post.");
+        $match_mean = Db::name("match_mean")
+            ->field("mean_id,name,mobile,nationality,sex")
+            ->where(["user_id"=>$this->uid])
+            ->page($data["page"],10)
+            ->order("mean_id desc")
+            ->select();
+        return self::asJson($match_mean);
+    }
+
+    /**
+     * 我的完善资料编辑
+     */
+    public function meanEdit()
+    {
+        $data = input("post.");
+        //正则表达式
+        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["mobile"]);
+        if ($mobiles == 0) {
+            return self::asJson([], 400, "请输入手机格式");
+        }
+        $mobiles = preg_match_all("/^1[345789]\d{9}$/", $data["emergency_mobile"]);
+        if ($mobiles == 0) {
+            return self::asJson([], 400, "请输入手机格式");
+        }
+        if ($data["emergency_mobile"] == $data["mobile"]) {
+            return self::asJson([], 400, "紧急联系人电话不能与联系人电话一致");
+        }
+        if (!empty($data["ccie"])) {
+            $data["ccie"] = json_encode($data["ccie"]);
+        }
+        $data["user_id"] = $this->uid;
+        Db::name("match_mean")->where(["mean_id"=>$data["mean_id"]])->update($data);
+        return self::asJson();
+    }
+
+    /**
+     * 我的完善资料编辑回显
+     */
+    public function meanEcho()
+    {
+        $data = input("post.");
+
+        $match_mean = Db::name("match_mean")->where(["mean_id"=>$data["mean_id"]])->find();
+        $match_mean["ccie"] = json_decode($match_mean["ccie"],true);
+        return self::asJson($match_mean);
+    }
+
+    /**
+     * 我的完善资料删除
+     */
+    public function meanDelete()
+    {
+        $data = input("post.");
+         Db::name("match_mean")->where(["mean_id"=>$data["mean_id"]])->delete();
         return self::asJson();
     }
 
