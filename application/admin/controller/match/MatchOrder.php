@@ -111,8 +111,17 @@ class MatchOrder extends AuthController
         $f[] = Form::input('city','居住地城市',$means["city"]);
         $f[] = Form::input('street','居住地街道信息',$means["street"]);
         $f[] = Form::input('size','衣服尺码',$means["size"]);
+        if(empty($means['ccie'])){
+            $ccie =[];
+        }else{
+            $ccie =json_decode($means['ccie'],1);
+        }
+        $f[] = Form::radio('disease','是否有疾病',$means['disease'])->options([['label'=>'是','value'=>1],['label'=>'否','value'=>0]])->col(8);
+        $f[] = Form::frameImages('slider_image','证书(640*640px)',Url::build('admin/widget.images/index',array('fodder'=>'slider_image')),$ccie)->maxLength(5)->icon('images')->width('100%')->height('500px');
         $f[] = Form::input('passport_name','护照姓名（姓/Surname，名/Given names）',$means["passport_name"]);
         $f[] = Form::input('passport_number','护照号码',$means["passport_number"]);
+//        $f[] = Form::radio('status','审核状态',$means['status'])->options([['label'=>'审核通过','value'=>1],['label'=>'待审核','value'=>0],['label'=>'审核未通过','value'=>-1]])->col(20);
+//        $f[] = Form::input('passport_number','审核未通过原因');
         $form = Form::make_post_form('返回',$f,Url::build('indexs'));
         $this->assign(compact('form'));
         return $this->fetch('public/form-builder');
@@ -142,7 +151,7 @@ class MatchOrder extends AuthController
     {
         $data = Util::postMore([
             'number',
-           ],$request);
+        ],$request);
 
         $match =Db::name("match_order")->where(["match_order_id"=>$id])->update($data);
 

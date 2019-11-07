@@ -926,5 +926,13 @@ class Macth extends AuthController
 
     }
 
+    /**
+     * 地区二级联动
+     */
+    public function area()
+    {
+
+    }
+
 
 }
