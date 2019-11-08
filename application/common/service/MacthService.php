@@ -112,9 +112,9 @@ class MacthService extends Service
         }else if(isset($data['popular']) && $data['popular']){ //最热赛事
             $follow = Db::table('eb_match')->page(1,3)->order('num desc')->select();
         }else if(isset($data['page']) && $data['page']){ //更多
-            $follow = Db::table('eb_match')->page($data['page'],5)->order('create_at desc')->select();
+            $follow = Db::table('eb_match')->page($data['page'],5)->order('match_starat desc')->select();
         }else{ //最新
-            $follow = Db::table('eb_match')->page(1,3)->order('create_at desc')->select();
+            $follow = Db::table('eb_match')->page(1,3)->order('match_starat desc')->select();
         }
         foreach ($follow as $key => $value){
             $follow[$key]['match_starat'] = date('Y-m-d',$value['match_starat']);
