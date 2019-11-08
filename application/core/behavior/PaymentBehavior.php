@@ -146,6 +146,7 @@ class PaymentBehavior
                     "status"=>1,
                 ];
                 Db::name("user_bill")->insert($bill);
+
                 if($match_order){
                     //阻止微信接口反复回调接口
                     $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
@@ -157,6 +158,7 @@ class PaymentBehavior
             if(StoreOrderRoutineModel::be(['order_id'=>$orderId,'paid'=>1])) return true;
             return StoreOrderRoutineModel::paySuccess($orderId);
         }catch (\Exception $e){
+            trace($e->getMessage(),"error");
             return false;
         }
     }

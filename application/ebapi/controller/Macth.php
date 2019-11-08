@@ -460,9 +460,9 @@ class Macth extends AuthController
     public function mean()
     {
         $data = input("post.");
-        $data["nationality"] = Db::name("country")->where(["id"=>$data["nationality"]])->value("country");
-        $data["residence"] = Db::name("country")->where(["id"=>$data["residence"]])->value("state");
-        $data["city"] = Db::name("country")->where(["id"=>$data["city"]])->value("city");
+//        $data["nationality"] = Db::name("country")->where(["id"=>$data["nationality"]])->value("country");
+//        $data["residence"] = Db::name("country")->where(["id"=>$data["residence"]])->value("state");
+//        $data["city"] = Db::name("country")->where(["id"=>$data["city"]])->value("city");
 
         if ($data["emergency_mobile"] == $data["mobile"]) {
             return self::asJson([], 400, "紧急联系人电话不能与联系人电话一致");
@@ -496,9 +496,9 @@ class Macth extends AuthController
     public function meanEdit()
     {
         $data = input("post.");
-        $data["nationality"] = Db::name("country")->where(["id"=>$data["nationality"]])->value("country");
-        $data["residence"] = Db::name("country")->where(["id"=>$data["residence"]])->value("state");
-        $data["city"] = Db::name("country")->where(["id"=>$data["city"]])->value("city");
+//        $data["nationality"] = Db::name("country")->where(["id"=>$data["nationality"]])->value("country");
+//        $data["residence"] = Db::name("country")->where(["id"=>$data["residence"]])->value("state");
+//        $data["city"] = Db::name("country")->where(["id"=>$data["city"]])->value("city");
 
         if ($data["emergency_mobile"] == $data["mobile"]) {
             return self::asJson([], 400, "紧急联系人电话不能与联系人电话一致");
