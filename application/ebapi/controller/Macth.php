@@ -5,6 +5,7 @@ namespace app\ebapi\controller;
 use app\common\service\MacthService;
 use chuanglan\demo\API\ChuanglanSmsHelper\ChuanglanSmsApi;
 use think\Db;
+use think\Exception;
 use think\Request;
 
 /**
@@ -343,85 +344,94 @@ class Macth extends AuthController
 
         //可选服务
         $match_goods_price = 0;
-        if (empty($data['service_id'])) {
-            $data['service_id'] = 0;
-        } else {
-            $num = 0;
-            $cart_id = [];
-            foreach ($data['service_id'] as $k => $v) {
-                $match_goods = Db::name("match_goods")->where(['service_id' => $v["service_id"]])->value("price");
-                $match_goods_price += $match_goods * $v["num"];
-                $num += $v["num"];
-                $cart_id[$k] = $v["service_id"];
-                Db::name("match_order_goods")->insert(['match_order_sn' => $str, 'num' => $v["num"], 'price' => $match_goods * $v["num"], 'add_time' => time(), 'service_id' => $v["service_id"]]);
-                $json[$k] = [
-                    "id" => $v["service_id"],
+        Db::startTrans();
+        try {
+            if (empty($data['service_id'])) {
+                $data['service_id'] = 0;
+            } else {
+                $num = 0;
+                $cart_id = [];
+                foreach ($data['service_id'] as $k => $v) {
+                    $match_goods = Db::name("match_goods")->where(['service_id' => $v["service_id"]])->value("price");
+                    $match_goods_price += $match_goods * $v["num"];
+                    $num += $v["num"];
+                    $cart_id[$k] = $v["service_id"];
+                    Db::name("match_order_goods")->insert(['match_order_sn' => $str, 'num' => $v["num"], 'price' => $match_goods * $v["num"], 'add_time' => time(), 'service_id' => $v["service_id"]]);
+                    $json[$k] = [
+                        "id" => $v["service_id"],
+                        "uid" => $this->uid,
+                        "type" => "product",
+                        "product_id" => $v["service_id"],
+                        "cart_num" => $v["num"],
+                        "add_time" => time(),
+                        "productInfo" => [
+                            "image" => $v["logo"],
+                            "price" => $match_goods,
+                            "store_name" => $v["goods_name"],
+                            "unit_name" => "件",
+                        ],
+                        "truePrice" => $v["price"],
+                    ];
+                }
+                $user = Db::name('user')->where(['uid' => $this->uid])->find();
+                $user_address = Db::name('user_address')->where(['uid' => $this->uid])->find();
+                $arrays = [
+                    "order_id" => $str,
                     "uid" => $this->uid,
-                    "type" => "product",
-                    "product_id" => $v["service_id"],
-                    "cart_num" => $v["num"],
+                    "real_name" => $user["nickname"],
+                    "user_phone" => $user["phone"],
+                    "user_address" => $user_address["detail"],
+                    "cart_id" => json_encode($cart_id),
+                    "total_num" => $num,
+                    "total_price" => $match_goods_price,
+                    "pay_price" => $match_goods_price,
+                    "pay_type" => "weixin",
                     "add_time" => time(),
-                    "productInfo" => [
-                        "image" => $v["logo"],
-                        "price" => $v["price"],
-                        "store_name" => $v["goods_name"],
-                        "unit_name" => "件",
-                    ],
-                    "truePrice" => $v["price"],
-                ];
-            }
-            $user = Db::name('user')->where(['uid' => $this->uid])->find();
-            $user_address = Db::name('user_address')->where(['uid' => $this->uid])->find();
-            $arrays = [
-                "order_id" => $str,
-                "uid" => $this->uid,
-                "real_name" => $user["nickname"],
-                "user_phone" => $user["phone"],
-                "user_address" => $user_address["detail"],
-                "cart_id" => json_encode($cart_id),
-                "total_num" => $num,
-                "total_price" => $match_goods_price,
-                "pay_price" => $match_goods_price,
-                "pay_type" => "weixin",
-                "add_time" => time(),
-                "unique" => md5(rand(1000000, 9999999)),
-                "is_channel" => 1,
-            ];
-            Db::name("store_order")->insert($arrays);
-            $store_order = Db::name("store_order")->getLastInsID();
-            foreach ($json as $k => $v) {
-                $store_order_cart_info = [
-                    "oid" => $store_order,
-                    "cart_id" => $v["id"],
-                    "product_id" => $v["id"],
-                    "cart_info" => json_encode($json[$k]),
                     "unique" => md5(rand(1000000, 9999999)),
-                ];;
-                Db::name("store_order_cart_info")->insert($store_order_cart_info);
+                    "is_channel" => 1,
+                ];
+
+                Db::name("store_order")->insert($arrays);
+                $store_order = Db::name("store_order")->getLastInsID();
+                foreach ($json as $k => $v) {
+                    $store_order_cart_info = [
+                        "oid" => $store_order,
+                        "cart_id" => $v["id"],
+                        "product_id" => $v["id"],
+                        "cart_info" => json_encode($json[$k]),
+                        "unique" => md5(rand(1000000, 9999999)),
+                    ];;
+                    Db::name("store_order_cart_info")->insert($store_order_cart_info);
+                }
+
+
             }
+            $order_price = $pricee + $meal_price + $match_goods_price;
+            $order_price = round($order_price, 2);
 
-
+            $add = [
+                "uid" => $this->uid,
+                "match_id" => $data["match_id"],
+                "order_price" => $order_price,
+                "match_order_sn" => $str,
+                "add_time" => time(),
+                "match_name" => $match_name,
+                "remarks" => $data["remarks"],
+                "red_id" => $data["red_id"],
+                "meal_id" => $data["meal_id"],
+                "service_id" => json_encode($data["service_id"]),
+                "address_id" => $data["address_id"],
+            ];
+            Db::name("match_order")->insert($add);
+            $array["match_order_id"] = Db::name("match_order")->getLastInsID();
+            $array["match_order_sn"] = $str;
+            Db::commit();
+            return self::asJson($array);
+        }catch (Exception $e){
+            trace($e->getMessage(),"error") ;
+            Db::rollback();
         }
-        $order_price = $pricee + $meal_price + $match_goods_price;
-        $order_price = round($order_price, 2);
 
-        $add = [
-            "uid" => $this->uid,
-            "match_id" => $data["match_id"],
-            "order_price" => $order_price,
-            "match_order_sn" => $str,
-            "add_time" => time(),
-            "match_name" => $match_name,
-            "remarks" => $data["remarks"],
-            "red_id" => $data["red_id"],
-            "meal_id" => $data["meal_id"],
-            "service_id" => json_encode($data["service_id"]),
-            "address_id" => $data["address_id"],
-        ];
-        Db::name("match_order")->insert($add);
-        $array["match_order_id"] = Db::name("match_order")->getLastInsID();
-        $array["match_order_sn"] = $str;
-        return self::asJson($array);
     }
 
     /**
