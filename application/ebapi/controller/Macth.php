@@ -529,7 +529,7 @@ class Macth extends AuthController
     public function meanDelete()
     {
         $data = input("post.");
-         Db::name("match_mean")->where(["mean_id"=>$data["mean_id"]])->delete();
+        Db::name("match_mean")->where(["mean_id"=>$data["mean_id"]])->delete();
         return self::asJson();
     }
 
@@ -622,6 +622,52 @@ class Macth extends AuthController
         $order_price = $pricee + $meal_price + $match_goods_price;
         $order_price = round($order_price, 2);
         return self::asJson($order_price);
+
+    }
+
+    /**
+     * 获取订单明细
+     */
+    public function orderAll()
+    {
+        $data = input("post.");
+        $array =[];
+        $match_red = Db::name("match_red")->where(['red_id' => $data['red_id']])->find();
+        if(empty($match_red)){
+            $array["match_red"]["name"] = "赛程：无";
+            $array["match_red"]["price"] = "0";
+        }else{
+            $array["match_red"]["name"] = "赛程：".$match_red["spec_name"];
+            $array["match_red"]["price"] = $match_red["price"];
+        }
+        //套餐
+        if (empty($data['meal_id'])) {
+            $array["match_meal"]["name"] = "套餐：无";
+            $array["match_meal"]["price"] = "0";
+
+        } else {
+            $meal_price = Db::name("match_meal")->where(['meal_id' => $data['meal_id']])->find();
+            $array["match_meal"]["name"] = "套餐：".$meal_price["title"];
+            $array["match_meal"]["price"] = $meal_price["price"];
+        }
+
+        //可选服务
+        $match_goods_price = 0;
+        if (empty($data['service_id'])) {
+            $array["match_goods"]["name"] = "服务：无";
+            $array["match_goods"]["price"] = "0";
+        } else {
+            foreach ($data['service_id'] as $k => $v) {
+                $match_goods = Db::name("match_goods")->where(['service_id' => $v["service_id"]])->value("price");
+                $array["match_goods"][$k]["name"] = "服务：".$v["goods_name"];
+                $array["match_goods"][$k]["price"] = $v["num"]*$match_goods;
+                $match_goods_price += $match_goods * $v["num"];
+            }
+
+        }
+        $order_price = $match_red["price"] + $array["match_meal"]["price"] + $match_goods_price;
+        $array["order_price"] = round($order_price, 2);
+        return self::asJson($array);
 
     }
 
