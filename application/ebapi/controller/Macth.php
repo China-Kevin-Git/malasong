@@ -3,6 +3,8 @@
 namespace app\ebapi\controller;
 
 use app\common\service\MacthService;
+use app\core\util\MiniProgramService;
+use app\ebapi\model\user\WechatUser;
 use chuanglan\demo\API\ChuanglanSmsHelper\ChuanglanSmsApi;
 use think\Db;
 use think\Exception;
@@ -439,18 +441,29 @@ class Macth extends AuthController
      */
     public function means()
     {
-
         $data = input("post.");
         if (empty($data['match_order_id']) && empty($data['mean_id'])) {
             return self::asJson([], 400, "参数错误");
         }
         if (stripos($data['match_order_id'], 'match-') !== false) {
-            $data['match_order_id'] = Db::name("match_order")->where(["match_order_sn", $data['match_order_id']])->value("match_order_id");
+            $data['match_order_id'] = Db::name("match_order")->where(["match_order_sn"=>$data['match_order_id']])->value("match_order_id");
         }
         $mean = Db::name("match_mean")->where(["mean_id" => $data['mean_id']])->find();
         $mean["match_order_id"] = $data['match_order_id'];
         Db::name("match_means")->insert($mean);
         Db::name("match_order")->where(['match_order_id' => $data['match_order_id']])->update(["status" => 3]);
+        //消息通知
+        $match_order = Db::name("match_order")->where(["match_order_id"=>$data['match_order_id']])->find();
+        $macth = Db::name("match")->where(["id", $match_order['match_id']])->find();
+        $data['keyword1'] =  $macth["match_name"];
+        $data['keyword2'] =  date('Y-m-d H:i:s',time());
+        $data['keyword3'] =  date('Y-m-d H:i:s',$macth["match_starat"]);
+        $data['keyword4'] =  $macth["province"].$macth["city"].$macth["area"].$macth["address"];
+        $data['keyword5'] =  "报名成功";
+        $data['keyword6'] =  '已支付';
+        $openid=WechatUser::uidToOpenid($match_order["uid"]);
+        $form_id = Db::name("routine_form_id")->where(["uid"=>$match_order["uid"],"status"=>1])->order("id desc")->value("form_id");
+        MiniProgramService::sendTemplate($openid,"VQJMYm13FMf6MByOioyliBXqG4tS6uoIockisbHq7t0",$data,$form_id);
         return self::asJson();
     }
 

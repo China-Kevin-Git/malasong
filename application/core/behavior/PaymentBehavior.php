@@ -11,6 +11,7 @@ use app\core\model\routine\RoutineTemplate;
 use app\ebapi\model\store\StoreOrder as StoreOrderRoutineModel;
 use app\ebapi\model\store\StoreOrder as StoreOrderWapModel; //待完善
 use app\ebapi\model\user\UserRecharge;
+use app\wap\model\user\WechatUser;
 use service\HookService;
 use app\core\util\MiniProgramService;
 use app\core\util\WechatService;
@@ -151,10 +152,12 @@ class PaymentBehavior
                 if($match_order){
                     $data['keyword1'] =  $orderId;
                     $data['keyword2'] =  date('Y-m-d H:i:s',time());
-                    $data['keyword3'] =  '已支付';
-                    $data['keyword4'] =  $order['pay_price'];
-                    $data['keyword5'] =  '微信支付';
-                    RoutineTemplate::sendOut('ORDER_PAY_SUCCESS',$order['uid'],$data,"",'/pages/order_details/index?order_id='.$orderId);
+                    $data['keyword3'] =  $order['order_price'];
+                    $data['keyword4'] =  $order['order_price'];
+                    $data['keyword5'] =  '已支付';
+                    $openid=Db::name("wechat_user")->where(["uid"=>$order["uid"]])->value("routine_openid");
+                    $form_id = Db::name("routine_form_id")->where(["uid"=>$order["uid"],"status"=>1])->order("id desc")->value("form_id");
+//                    MiniProgramService::sendTemplate($openid,"HSPsSruY4WhS2l3tAAqirzZhS5USb7D8GE-F82bEixo",$data,$form_id);
 
                     //阻止微信接口反复回调接口
                     $str='<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
