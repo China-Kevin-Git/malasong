@@ -654,8 +654,8 @@ class Macth extends AuthController
         //可选服务
         $match_goods_price = 0;
         if (empty($data['service_id'])) {
-            $array["match_goods"]["name"] = "服务：无";
-            $array["match_goods"]["price"] = "0";
+            $array["match_goods"][0]["name"] = "服务：无";
+            $array["match_goods"][0]["price"] = "0";
         } else {
             foreach ($data['service_id'] as $k => $v) {
                 $match_goods = Db::name("match_goods")->where(['service_id' => $v["service_id"]])->value("price");
